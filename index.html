@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAOK · Random Act of Kindness</title>
+<meta name="description" content="One small act of kindness a day, done together. Join the waitlist for RAOK, the app that makes kindness a daily habit.">
+<meta property="og:title" content="RAOK · Random Act of Kindness">
+<meta property="og:description" content="One small act of kindness a day, done together. Join the waitlist.">
+<meta property="og:url" content="https://www.raokapp.com">
+<meta name="theme-color" content="#D9F6EE">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23EEF9E7'/%3E%3Cpath d='M32 48s-14-8.5-14-19a8 8 0 0 1 14-5.3A8 8 0 0 1 46 29c0 10.5-14 19-14 19z' fill='%23386C1C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B2A33; --soft:#4F4B57; --muted:#6E6A75; --cream:#FFF8F1; --white:#FFFFFF;
+    --line:#ECE3DA; --green:#386C1C; --green-bg:#EEF9E7; --green-line:#CFE8BF;
+    --teal:#0C8079; --teal-ring:#2BB8AE; --teal-tint:#DDF3F1; --lilac:#6B5BD6; --lilac-tint:#EFEBFD;
+    --shadow:0 6px 24px rgba(60,40,30,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#D9F6EE 0,#D6F1F4 520px,var(--cream) 980px,var(--cream) 100%);line-height:1.5}
+  h1,h2,h3,.logo{font-family:'Space Grotesk',Inter,sans-serif;letter-spacing:-.02em}
+  a{color:var(--green)}
+  .container{max-width:1120px;margin:0 auto;padding:0 24px}
+  /* nav */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .logo{font-weight:700;font-size:28px;color:var(--green);text-decoration:none}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:14px;border:1px solid var(--green-line);background:var(--green-bg);color:var(--green);font-weight:600;font-size:16px;text-decoration:none;cursor:pointer;font-family:inherit;transition:transform .1s, box-shadow .2s}
+  .btn:hover{box-shadow:0 4px 14px rgba(56,108,28,.15)}
+  .btn:active{transform:translateY(1px)}
+  .btn.solid{background:var(--green);color:#fff;border-color:var(--green)}
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding:40px 0 80px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--teal);background:rgba(255,255,255,.7);border:1px solid var(--teal-tint);padding:6px 12px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+  .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--teal-ring)}
+  .hero h1{font-size:clamp(40px,6vw,66px);line-height:1.02;margin:18px 0 18px}
+  .hero h1 span{color:var(--teal)}
+  .lead{font-size:clamp(17px,2vw,20px);color:var(--soft);max-width:540px;margin:0 0 28px}
+  .waitlist{display:flex;gap:10px;flex-wrap:wrap;max-width:520px}
+  .waitlist input{flex:1 1 240px;min-height:52px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:#fff;font:inherit;font-size:16px;color:var(--ink)}
+  .waitlist input:focus{outline:3px solid var(--green-line);border-color:var(--green)}
+  .waitlist .btn{min-height:52px}
+  .formnote{font-size:14px;color:var(--muted);margin-top:10px}
+  .formmsg{font-size:15px;font-weight:600;color:var(--green);margin-top:10px;display:none}
+  /* phone */
+  .phone{justify-self:center;width:320px;border-radius:42px;background:#fff;padding:12px;box-shadow:0 30px 60px rgba(30,60,60,.18),0 0 0 1px rgba(0,0,0,.04)}
+  .screen{border-radius:32px;overflow:hidden;background:linear-gradient(180deg,#D9F6EE 0,#D6F1F4 200px,var(--cream) 420px);padding:18px 16px 20px;display:flex;flex-direction:column;gap:10px}
+  .ph-top{display:flex;justify-content:space-between;align-items:center}
+  .ph-logo{font-family:'Space Grotesk';font-weight:700;font-size:22px;color:var(--green)}
+  .ph-date{font-size:11px;font-weight:600;padding:5px 9px;border-radius:999px;background:#F5ECE4;color:var(--soft)}
+  .ph-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .ph-tabs span{text-align:center;font-size:12px;font-weight:600;padding:9px 0;border-radius:999px;background:#fff;border:1px solid var(--line)}
+  .ph-tabs span.on{background:var(--green-bg);border-color:var(--green-line);color:var(--green)}
+  .ph-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 3px 12px rgba(60,40,30,.05)}
+  .ph-ring{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .ph-ring .wrap{position:relative;width:130px;height:130px}
+  .ph-ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ph-ring .num b{font-family:'Space Grotesk';font-size:28px;line-height:1}
+  .ph-ring .num span{font-size:11px;color:var(--muted)}
+  .ph-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+  .ph-seal{display:flex;align-items:center;gap:10px;border:1.5px dashed var(--green);border-radius:16px;padding:12px;background:#fff}
+  .ph-seal.p{border-color:var(--lilac)}
+  .ph-seal i{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-style:normal;font-family:'Space Grotesk';font-weight:700;font-size:20px;background:var(--green-bg);color:var(--green)}
+  .ph-seal.p i{background:var(--lilac-tint);color:var(--lilac)}
+  .ph-seal b{display:block;font-family:'Space Grotesk';font-size:14px}
+  .ph-seal span{font-size:11px;color:var(--muted)}
+  /* sections */
+  section{padding:72px 0}
+  .center{text-align:center}
+  h2{font-size:clamp(30px,4vw,44px);line-height:1.08;margin:0 0 14px}
+  .sub{color:var(--soft);font-size:18px;max-width:620px;margin:0 auto 40px}
+  .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:var(--shadow)}
+  .num-badge{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);margin-bottom:16px}
+  .card h3{font-size:22px;margin:0 0 8px}
+  .card p{margin:0;color:var(--soft)}
+  .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  .icon.t{background:var(--teal-tint);color:var(--teal)}
+  .icon.g{background:var(--green-bg);color:var(--green)}
+  .icon.l{background:var(--lilac-tint);color:var(--lilac)}
+  .soon{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:#F5ECE4;color:var(--soft);margin-left:6px;vertical-align:middle}
+  .quote{max-width:760px;margin:0 auto;text-align:center;font-family:'Space Grotesk';font-size:clamp(24px,3.2vw,34px);line-height:1.25}
+  .quote span{color:var(--teal)}
+  .cta{background:#fff;border:1px solid var(--line);border-radius:28px;padding:48px 32px;box-shadow:var(--shadow);text-align:center}
+  .cta .waitlist{margin:0 auto}
+  footer{padding:36px 0 48px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line)}
+  @media (max-width:880px){
+    .hero{grid-template-columns:1fr;padding-top:16px}
+    .steps,.features{grid-template-columns:1fr}
+    .nav .btn{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="nav">
+    <a class="logo" href="#">RAOK</a>
+    <a class="btn" href="#join">Join the waitlist</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Coming soon</span>
+      <h1>One small act of kindness. <span>Every day. Together.</span></h1>
+      <p class="lead">RAOK gives everyone the same simple act of kindness each morning, plus a private one just for you. Do it, tick it off, and watch kindness add up across the country.</p>
+      <form class="waitlist" data-waitlist action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <label for="email1" style="position:absolute;left:-9999px">Email address</label>
+        <input id="email1" type="email" name="email" placeholder="Your email address" required>
+        <button class="btn solid" type="submit">Join the waitlist</button>
+      </form>
+      <p class="formnote">Be first to try it. No spam, just a note when we launch.</p>
+      <p class="formmsg" role="status"></p>
+    </div>
+
+    <div class="phone" aria-hidden="true">
+      <div class="screen">
+        <div class="ph-top"><span class="ph-logo">RAOK</span><span class="ph-date">Today</span></div>
+        <div class="ph-tabs"><span class="on">Community</span><span>You</span></div>
+        <div class="ph-card ph-ring">
+          <div class="ph-label" style="align-self:flex-start">Live today · community goal</div>
+          <div class="wrap">
+            <svg width="130" height="130" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#E3EFEE" stroke-width="16"/><circle cx="100" cy="100" r="86" fill="none" stroke="#2BB8AE" stroke-width="16" stroke-linecap="round" stroke-dasharray="346 540" transform="rotate(-90 100 100)"/></svg>
+            <div class="num"><span>acts today</span><b>3,204</b><span>/ 5,000</span></div>
+          </div>
+        </div>
+        <div class="ph-seal"><i>?</i><div><b>Tap to reveal</b><span>Today's act, for everyone</span></div></div>
+        <div class="ph-seal p"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></i><div><b>Sealed for you</b><span>Your private act</span></div></div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<section style="background:rgba(255,255,255,.55)">
+  <div class="container center">
+    <h2>How it works</h2>
+    <p class="sub">Two minutes a day. No pressure, no competition. Just a little more kindness in the world.</p>
+    <div class="steps" style="text-align:left">
+      <div class="card">
+        <div class="num-badge">1</div>
+        <h3>Reveal today's act</h3>
+        <p>Every morning, everyone gets the same small act, like holding a door or complimenting a stranger's dog. Tap the card to reveal it.</p>
+      </div>
+      <div class="card">
+        <div class="num-badge">2</div>
+        <h3>Open your private one</h3>
+        <p>A second act, just for you, gently stretches your comfort zone. Do it, swap it, or skip it. Skipping never breaks your streak.</p>
+      </div>
+      <div class="card">
+        <div class="num-badge">3</div>
+        <h3>Watch kindness grow</h3>
+        <p>Tick it off and see the live count rise as people across the country do the same. Share a story if you like.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container center">
+    <h2>Made to keep you going</h2>
+    <p class="sub">Gentle encouragement, never guilt.</p>
+    <div class="features" style="text-align:left">
+      <div class="card">
+        <div class="icon t"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9"/></svg></div>
+        <h3>Community goal</h3>
+        <p>A live ring shows everyone working towards today's target together.</p>
+      </div>
+      <div class="card">
+        <div class="icon t"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+        <h3>Streak calendar</h3>
+        <p>See every kind day this month at a glance, with milestones to aim for.</p>
+      </div>
+      <div class="card">
+        <div class="icon g"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></div>
+        <h3>Monthly challenges</h3>
+        <p>Hit a monthly goal and help unlock real-world rewards for good causes.</p>
+      </div>
+      <div class="card">
+        <div class="icon l"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></div>
+        <h3>Private journal</h3>
+        <p>Note how each personal act felt. Only you can see it.</p>
+      </div>
+      <div class="card">
+        <div class="icon g"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M14 20a4.5 4.5 0 0 1 7 0"/></svg></div>
+        <h3>Circles <span class="soon">Soon</span></h3>
+        <p>Private groups for family, friends or work, all adding up your kindness together.</p>
+      </div>
+      <div class="card">
+        <div class="icon t"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div>
+        <h3>Pay-it-forward chains <span class="soon">Soon</span></h3>
+        <p>Pass on a kindness card and follow it from town to town on a map.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <p class="quote">Kindness is small on its own.<br><span>Together, it adds up.</span></p>
+  </div>
+</section>
+
+<section id="join" style="padding-top:24px">
+  <div class="container">
+    <div class="cta">
+      <h2>Be one of the first</h2>
+      <p class="sub" style="margin-bottom:24px">Join the waitlist and we'll let you know the moment RAOK is ready.</p>
+      <form class="waitlist" data-waitlist action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <label for="email2" style="position:absolute;left:-9999px">Email address</label>
+        <input id="email2" type="email" name="email" placeholder="Your email address" required>
+        <button class="btn solid" type="submit">Join the waitlist</button>
+      </form>
+      <p class="formmsg" role="status"></p>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <footer>
+    <span>© 2026 RAOK · Random Act of Kindness</span>
+    <span><a href="mailto:hello@raokapp.com">hello@raokapp.com</a></span>
+  </footer>
+</div>
+
+<script>
+  // Sends sign-ups to Formspree without leaving the page.
+  document.querySelectorAll('[data-waitlist]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var msg = form.parentElement.querySelector('.formmsg');
+      var btn = form.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Joining…';
+      fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error();
+          form.style.display = 'none';
+          msg.textContent = "You're on the list! We'll be in touch when RAOK launches.";
+          msg.style.display = 'block';
+        })
+        .catch(function () {
+          btn.disabled = false; btn.textContent = 'Join the waitlist';
+          msg.textContent = "Sorry, that didn't go through. Please try again in a moment.";
+          msg.style.display = 'block';
+        });
+    });
+  });
+</script>
+</body>
+</html>
