@@ -544,7 +544,7 @@
     $("didIt").textContent = did ? "✓ Done today" : "I did it";
     $("didIt").classList.toggle("done", did);
     $("afterDone").classList.toggle("hidden", !did);
-    const storyWrapped = did && (priv.storyDone || {})[TODAY] && !storyEditing;
+    const storyWrapped = did && ((priv.storyDone || {})[TODAY] || (pub.last === TODAY && !!pub.note)) && !storyEditing;
     const hasFeel = !!(priv.feel || {})[TODAY + ":c"];
     $("storyEdit").classList.toggle("hidden", !hasFeel || storyWrapped);
     $("storyDone").classList.toggle("hidden", !storyWrapped);
