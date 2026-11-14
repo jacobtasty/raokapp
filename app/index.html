@@ -165,6 +165,20 @@
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
   .feel.picked{display:block}
+  .tag.mural{background:#FCE3E8;color:#B23A57}
+  .muralbox{border-radius:16px;background:linear-gradient(180deg,#FFFDF9,#FFF4EA);border:1px solid var(--line);padding:10px}
+  .muralbox svg{display:block;width:100%;height:auto}
+  .mrow{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--soft)}
+  .mrow b{font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--ink)}
+  .mbar{height:8px;border-radius:99px;background:var(--teal-track);overflow:hidden}
+  .mbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#F07E93,#E8607A)}
+  .pill.on{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-dark)}
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+  .swatches button{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;font-size:12px;font-weight:600;color:var(--soft);padding:0}
+  .swatches i{width:52px;height:52px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--line2)}
+  .swatches button.on i{box-shadow:0 0 0 3px var(--ink)}
+  .handline{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--soft)}
+  .handline svg{flex:none}
   .feel .felt .tlink{all:unset;cursor:pointer;color:var(--teal-dark);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;padding:6px 2px}
   .felt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--cream);border:1px solid var(--line);font-size:15px;font-weight:600;color:var(--ink)}
   .felt .e{font-size:22px;line-height:1}
@@ -240,6 +254,7 @@
         <button class="big" id="didIt">I did it</button>
         <div id="afterDone" class="stack hidden">
           <p class="proof">Research shows the person you helped probably felt even better than you think.</p>
+          <div class="handline"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#hand" id="handlineUse"/></svg><span class="grow" id="handlineText">Your handprint is on the mural.</span><button class="tlink" id="seeMural" type="button">See it</button></div>
           <div><p class="flabel">How did it feel? Only you see this.</p><div class="feel" data-feel="c"></div></div>
           <div id="storyEdit" class="stack">
             <label><p class="flabel">Share what happened (optional, others will see it)</p>
@@ -291,6 +306,19 @@
       <div style="font-size:14px;color:var(--soft)" id="chCount"></div>
       <div class="bar" id="chBar"><div class="track"></div><div class="fill" id="chFill"></div></div>
       <p class="small">Every daily act and personal act counts.</p>
+    </div>
+
+    <div class="card" id="muralCard">
+      <div class="chtop"><span class="tag mural" id="muralTag">Community mural</span><span class="small" id="muralLeft"></span></div>
+      <div class="chtitle" id="muralTitle"></div>
+      <div class="muralbox"><svg id="muralSvg" viewBox="0 0 300 300" role="img" aria-label="Community handprint mural"></svg></div>
+      <div class="mrow"><span><b id="muralCount">0</b> <span id="muralGoal"></span></span><span id="muralPct"></span></div>
+      <div class="mbar"><i id="muralFill" style="width:0"></i></div>
+      <p class="small" id="muralSub">Every community act adds a handprint. Fill the mural together to reveal the hidden picture.</p>
+      <div class="row">
+        <button class="pill" id="findMine" type="button">Find my handprints</button>
+        <button class="pill" id="pickColour" type="button">My colour</button>
+      </div>
     </div>
 
     <div class="sechead"><h2>Today's stories</h2><span id="storiesTag">Live</span></div>
@@ -359,6 +387,24 @@
 </div></div>
 
 <!-- Share card sheet -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="hand" viewBox="0 0 24 24">
+    <rect x="6.2" y="10.5" width="11.6" height="11.5" rx="4.6"/>
+    <rect x="6.4" y="3.6" width="2.7" height="10" rx="1.35"/>
+    <rect x="9.6" y="1.8" width="2.7" height="11" rx="1.35"/>
+    <rect x="12.8" y="2.6" width="2.7" height="10.4" rx="1.35"/>
+    <rect x="15.9" y="5.2" width="2.5" height="8.6" rx="1.25"/>
+    <rect x="1.6" y="11.2" width="2.7" height="8" rx="1.35" transform="rotate(-38 3 15.2)"/>
+  </symbol>
+</defs></svg>
+
+<div class="overlay" id="colourSheet"><div class="sheet">
+  <h3>Your handprint colour</h3>
+  <p class="sub">Every time you do the daily act, a handprint in this colour goes on the community mural.</p>
+  <div class="swatches" id="swatches"></div>
+  <button class="big" id="saveColour">Save my colour</button>
+</div></div>
+
 <div class="overlay" id="cardSheet"><div class="sheet">
   <h3>Your share card</h3>
   <p class="sub">Press and hold the image to save it, then post it anywhere.</p>
@@ -396,12 +442,13 @@
 
   // ---------- State ----------
   const LS = "raok_v1";
-  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {} });
+  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {}, colour: "" });
   const blankPub = () => ({ last: "", note: "", town: "", days: {}, at: 0 });
   let priv = blankPriv(), pub = blankPub();
   let todayDocs = [];
   let shared = false;
-  let db = null, uid = null, writing = Promise.resolve();
+  let todayTotal = 0, me = null, sbOk = false, pushPending = false;
+  let mural = { rows: [], total: 0 }, findMine = false, pickedColour = null;
   let calY = now.getFullYear(), calM = now.getMonth();
 
   const loadLocal = () => { try { const v = JSON.parse(localStorage.getItem(LS) || "null"); if (v) { priv = Object.assign(blankPriv(), v.priv); pub = Object.assign(blankPub(), v.pub); } } catch (e) {} };
@@ -410,19 +457,148 @@
   const $ = id => document.getElementById(id);
   const notice = msg => { const n = $("notice"); if (!msg) { n.classList.add("hidden"); return; } n.textContent = msg; n.classList.remove("hidden"); };
 
+  // ---------- Shared data (Supabase) ----------
+  // Only the shared bits go to the server: today's tick, town, an optional public story and handprint colour.
+  // Personal acts, feelings and the journal never leave the phone.
+  const SB_URL = "https://fuawgudbybdhxzervsuq.supabase.co";
+  const SB_KEY = "sb_publishable_hF5ecnfxmWqXMThTetrzuQ_UaDl-Gxc";
+  const AUTH_LS = "raok_auth";
+  let session = null;
+  async function sbAuth(path, body) {
+    const r = await fetch(SB_URL + "/auth/v1/" + path, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (!r.ok) { const e = new Error("auth " + r.status); e.status = r.status; throw e; }
+    return r.json();
+  }
+  function keepSession(d) {
+    session = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || Math.floor(Date.now() / 1000) + (d.expires_in || 3600), user_id: d.user && d.user.id };
+    try { localStorage.setItem(AUTH_LS, JSON.stringify(session)); } catch (e) {}
+  }
+  let sessionWait = null;
+  function ensureSession() { return sessionWait || (sessionWait = getSession().finally(() => { sessionWait = null; })); }
+  async function getSession() {
+    if (!session) { try { session = JSON.parse(localStorage.getItem(AUTH_LS) || "null"); } catch (e) {} }
+    if (session && session.access_token && session.expires_at - 60 > Date.now() / 1000) return session;
+    if (session && session.refresh_token) {
+      try { keepSession(await sbAuth("token?grant_type=refresh_token", { refresh_token: session.refresh_token })); return session; }
+      catch (e) { if (!e.status || e.status >= 500) throw e; }  // offline: try again later; only start fresh if the token is truly dead
+    }
+    keepSession(await sbAuth("signup", { data: {} }));  // anonymous sign-in, no email needed
+    return session;
+  }
+  async function sb(path, opts = {}) {
+    const s = await ensureSession(); me = s.user_id;
+    const r = await fetch(SB_URL + "/rest/v1/" + path, {
+      method: opts.method || "GET",
+      headers: Object.assign({ apikey: SB_KEY, Authorization: "Bearer " + s.access_token, "Content-Type": "application/json" }, opts.headers || {}),
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    if (r.status === 401 && !opts.retried) { session.expires_at = 0; return sb(path, Object.assign({}, opts, { retried: true })); }
+    if (!r.ok) throw new Error("rest " + r.status);
+    return r;
+  }
+  const totalOf = (r, n) => { const cr = r.headers.get("content-range"); const t = cr && +cr.split("/")[1]; return Number.isFinite(t) ? t : n; };
+
+  async function pushToday() {
+    if (!pub.days[TODAY]) return;
+    pushPending = true;
+    try {
+      const s = await ensureSession();
+      await sb("acts_done?on_conflict=user_id,day", {
+        method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: { user_id: s.user_id, day: TODAY, note: pub.last === TODAY && pub.note ? pub.note : null, town: priv.town || null, colour: myColour() }
+      });
+      pushPending = false;
+      await refresh();
+    } catch (e) { console.warn("RAOK sync", e); }
+  }
+  let refreshing = null;
+  function refresh() { return refreshing || (refreshing = doRefresh().finally(() => { refreshing = null; })); }
+  async function doRefresh() {
+    try {
+      if (pushPending) { pushPending = false; await pushToday(); return; }
+      const r = await sb("acts_done?day=eq." + TODAY + "&select=user_id,town,note,created_at&order=created_at.desc&limit=500", { headers: { Prefer: "count=exact" } });
+      const rows = await r.json();
+      todayTotal = totalOf(r, rows.length);
+      todayDocs = rows.map(x => ({ uid: x.user_id, town: x.town, note: x.note, last: TODAY, at: Date.parse(x.created_at) }));
+      const m = monthKey(now.getFullYear(), now.getMonth()), goal = muralGoal();
+      const end = monthKey(now.getFullYear(), now.getMonth()) + "-" + String(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).padStart(2, "0");
+      const r2 = await sb("acts_done?day=gte." + m + "-01&day=lte." + end + "&select=user_id,colour&order=created_at.asc&limit=" + goal, { headers: { Prefer: "count=exact" } });
+      const mrows = await r2.json();
+      mural = { rows: mrows, total: totalOf(r2, mrows.length) };
+      if (!sbOk && pub.days[TODAY] && !rows.some(x => x.user_id === me)) { sbOk = true; shared = true; return pushToday(); } // tick from before accounts
+      sbOk = true; shared = true; notice("");
+    } catch (e) {
+      console.warn("RAOK refresh", e);
+      if (!sbOk) shared = false;
+    }
+    render();
+  }
+
   function persist(which) {
     saveLocal();
-    if (!shared) return;
-    writing = writing.then(async () => {
-      try {
-        if (which !== "pub") await db.doc("data/users/" + uid + "/state").set(JSON.parse(JSON.stringify(priv)));
-        if (which !== "priv") await db.collection("done").doc(uid).set(JSON.parse(JSON.stringify(pub)));
-      } catch (e) {
-        shared = false;
-        notice("You can use the app, but your acts are only saved on this device. Ask Jacob to invite you as an editor to join the shared count.");
-        render();
-      }
+    if (which === "priv") return;
+    if (pub.days[TODAY]) pushToday();
+  }
+
+  // ---------- Mural ----------
+  const COLOURS = [["Coral", "#E8607A"], ["Sunshine", "#F2B33D"], ["Leaf", "#4E9A2A"], ["Teal", "#0C8079"], ["Sky", "#4A90D9"], ["Lilac", "#6B5BD6"], ["Peach", "#F08A5D"], ["Berry", "#B8407A"]];
+  const MURAL_GOALS = { "2026-11": 100 };  // per-month targets; raise as the community grows
+  const muralGoal = () => MURAL_GOALS[monthKey(now.getFullYear(), now.getMonth())] || 500;
+  const colourFor = id => COLOURS[hash(String(id || "x")) % COLOURS.length][1];
+  const myColour = () => priv.colour || colourFor(priv.seed);
+  function muralCells(goal) {
+    const n = Math.ceil(Math.sqrt(goal)), step = 300 / n, cells = [];
+    for (let row = 0; row < n; row++) for (let col = 0; col < n; col++) {
+      const cx = col * step + step / 2, cy = row * step + step / 2;
+      const u = (cx - 150) / 112, v = (150 - cy) / 112 + 0.25, a = u * u + v * v - 1;
+      cells.push({ cx, cy, inside: a * a * a - u * u * v * v * v <= 0 });
+    }
+    const seed = "mural" + monthKey(now.getFullYear(), now.getMonth());
+    cells.sort((p, q) => hash(seed + p.cx + "," + p.cy) - hash(seed + q.cx + "," + q.cy));
+    return { cells: cells.slice(0, Math.max(goal, 1)), size: step };
+  }
+  function renderMural() {
+    const goal = muralGoal();
+    let rows = mural.rows, total = mural.total;
+    if (!shared) { // preview: just your own acts this month
+      const k = monthKey(now.getFullYear(), now.getMonth());
+      rows = Object.keys(pub.days).filter(d => d.startsWith(k)).sort().map(() => ({ user_id: "me-local", colour: myColour() }));
+      total = rows.length;
+    }
+    const mine = r => r.user_id === me || r.user_id === "me-local";
+    const done = total >= goal, { cells, size } = muralCells(goal), svg = $("muralSvg");
+    const NS = "http://www.w3.org/2000/svg";
+    svg.textContent = "";
+    cells.forEach((c, i) => {
+      const r = rows[i];
+      if (!r) { const d = document.createElementNS(NS, "circle"); d.setAttribute("cx", c.cx); d.setAttribute("cy", c.cy); d.setAttribute("r", Math.max(1.5, size * .06)); d.setAttribute("fill", "#E9DED3"); svg.appendChild(d); return; }
+      const u = document.createElementNS(NS, "use"), hs = size * .92, rot = (hash(i + ":" + r.user_id) % 50) - 25;
+      u.setAttribute("href", "#hand"); u.setAttribute("width", hs); u.setAttribute("height", hs);
+      u.setAttribute("x", c.cx - hs / 2); u.setAttribute("y", c.cy - hs / 2);
+      u.setAttribute("transform", "rotate(" + rot + " " + c.cx + " " + c.cy + ")");
+      u.setAttribute("fill", /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id));
+      let op = done || c.inside ? 1 : .3;
+      if (findMine) op = mine(r) ? 1 : .08;
+      u.setAttribute("opacity", op);
+      if (findMine && mine(r)) { u.setAttribute("stroke", "#2B2A33"); u.setAttribute("stroke-width", "1.2"); }
+      svg.appendChild(u);
     });
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(), left = lastDay - now.getDate();
+    $("muralTitle").textContent = done ? "We did it! The " + MONTHS[now.getMonth()] + " mural is complete" : MONTHS[now.getMonth()] + " mural: a hidden picture is appearing…";
+    $("muralTag").textContent = shared ? "Community mural" : "Preview · mural";
+    $("muralLeft").textContent = left === 0 ? "Last day" : left + (left === 1 ? " day left" : " days left");
+    $("muralCount").textContent = Math.min(total, 1e9).toLocaleString("en-GB");
+    $("muralGoal").textContent = "/ " + goal.toLocaleString("en-GB") + " handprints";
+    $("muralPct").textContent = Math.min(100, Math.floor(total / goal * 100)) + "%";
+    $("muralFill").style.width = Math.min(100, total / goal * 100) + "%";
+    const myN = rows.filter(mine).length;
+    $("muralSub").textContent = !shared ? "Only your own handprints show for now. Everyone's appear once you're connected." :
+      done ? "Every handprint is a real act of kindness" + (myN ? ", and " + myN + " of them " + (myN === 1 ? "is" : "are") + " yours." : ".") :
+      "Every community act adds a handprint. Fill it together to reveal the hidden picture." + (myN ? " " + myN + " " + (myN === 1 ? "is" : "are") + " yours." : "");
+    $("findMine").classList.toggle("on", findMine);
+    $("findMine").textContent = findMine ? "Show everyone" : "Find my handprints";
+    $("handlineUse").setAttribute("fill", myColour());
+    $("handlineText").textContent = "Your handprint is on the " + MONTHS[now.getMonth()] + " mural.";
   }
 
   function personalAct() {
@@ -449,7 +625,7 @@
     info.streak = run; info.best = best; info.bank = bank;
     return info;
   }
-  function count() { return shared ? todayDocs.length : (pub.days[TODAY] ? 1 : 0); }
+  function count() { return shared ? todayTotal : (pub.days[TODAY] ? 1 : 0); }
   function goalFor(c) { const steps = [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]; return steps.find(s => s > c) || (Math.ceil((c + 1) / 100000) * 100000); }
   const monthKey = (y, m) => y + "-" + String(m + 1).padStart(2, "0");
   function actsThisMonth() {
@@ -584,6 +760,7 @@
     $("chLeft").textContent = left === 0 ? "Last day" : left + (left === 1 ? " day left" : " days left");
     fillBar("chBar", "chFill", [{ at: 5, label: 5 }, { at: 10, label: 10 }, { at: 20, label: 20, pos: 100 }], Math.min(acts, target), target);
 
+    renderMural();
     document.querySelectorAll(".feel").forEach(renderFeel);
     $("pFeelBox").classList.toggle("hidden", priv.personal[TODAY] !== "done");
 
@@ -655,6 +832,7 @@
     if (pub.days[TODAY]) return;
     pub.days[TODAY] = true; pub.last = TODAY; pub.note = ""; pub.at = 0; pub.town = priv.town || "";
     if (!shared) todayDocs = [pub];
+    else { todayTotal++; if (mural.rows.length < muralGoal()) mural.rows.push({ user_id: me, colour: myColour() }); mural.total++; }
     persist("pub"); render();
   }
   function showView(v) {
@@ -796,7 +974,32 @@
   };
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
-  // Accounts and the shared community count plug in here later (Supabase).
+  // mural + colour
+  $("findMine").onclick = () => { findMine = !findMine; render(); };
+  $("seeMural").onclick = () => $("muralCard").scrollIntoView({ behavior: "smooth", block: "center" });
+  function openColours() {
+    pickedColour = myColour();
+    const box = $("swatches"); box.textContent = "";
+    COLOURS.forEach(([name, c]) => {
+      const b = el("button", c === pickedColour ? "on" : ""); b.type = "button";
+      const dot = el("i"); dot.style.background = c; b.append(dot, document.createTextNode(name));
+      b.onclick = () => { pickedColour = c; box.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); };
+      box.appendChild(b);
+    });
+    $("colourSheet").classList.add("show");
+  }
+  $("pickColour").onclick = openColours;
+  $("saveColour").onclick = () => {
+    priv.colour = pickedColour; $("colourSheet").classList.remove("show");
+    if (shared) mural.rows.forEach(r => { if (r.user_id === me) r.colour = pickedColour; });
+    persist(); render();
+  };
+  $("colourSheet").onclick = e => { if (e.target === $("colourSheet")) $("colourSheet").classList.remove("show"); };
+
+  // connect to the shared community, then keep it fresh while the app is open
+  refresh();
+  setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
 })();
 </script>
 </body>
