@@ -166,6 +166,9 @@
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
   .feel.picked{display:block}
+  .sethead{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:0;padding:0;min-height:32px;color:var(--soft)}
+  .sethead .chev{transition:transform .2s}
+  .sethead[aria-expanded=true] .chev{transform:rotate(180deg)}
   .quick{grid-template-columns:repeat(3,minmax(0,1fr))!important}
   .ideasbtn{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:none;border:0;padding:4px 0;color:var(--teal-dark);font-size:14px;font-weight:600}
   .personal .ideasbtn{color:var(--lilac)}
@@ -414,8 +417,12 @@
     <div id="journalList" class="stack"></div>
 
     <div class="card" style="margin-top:8px">
-      <span class="label">Settings</span>
+      <button class="sethead" id="setToggle" type="button" aria-expanded="false" aria-controls="setBody">
+        <span class="label">Settings</span>
+        <svg class="chev" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
       <p class="small" id="settingsLine" style="color:var(--soft)"></p>
+      <div class="stack hidden" id="setBody">
       <div class="row"><button class="pill" id="changeLevel">Comfort level</button><button class="pill" id="changeTown">Change town</button></div>
       <p class="flabel" style="margin-top:6px">Text size</p>
       <div class="sizes" id="sizes" role="group" aria-label="Text size">
@@ -425,6 +432,7 @@
         <button class="pill" type="button" data-ts="2" aria-label="Larger text" style="font-size:18px">A</button>
       </div>
       <button class="link" id="resetApp">Start again from scratch</button>
+      </div>
     </div>
     <p class="ver">RAOK web app · early version · your progress is saved on this phone</p>
   </section>
@@ -1174,6 +1182,13 @@
     $("recap").classList.add("hidden");
     $("muralCard").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" });
     setTimeout(() => { recapPop = [+$("recap").dataset.from, +$("recap").dataset.to]; render(); setTimeout(() => { recapPop = null; }, 3000); }, 450);
+  };
+
+  $("settingsLine").onclick = () => { if ($("setBody").classList.contains("hidden")) $("setToggle").click(); };
+  $("settingsLine").style.cursor = "pointer";
+  $("setToggle").onclick = () => {
+    const open = $("setBody").classList.toggle("hidden") === false;
+    $("setToggle").setAttribute("aria-expanded", open ? "true" : "false");
   };
 
   // done-for-today
