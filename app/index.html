@@ -173,7 +173,9 @@
   .mbar{height:8px;border-radius:99px;background:var(--teal-track);overflow:hidden}
   .mbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#F07E93,#E8607A)}
   .pill.on{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-dark)}
-  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0 16px}
+  .swatches.skins{grid-template-columns:repeat(3,1fr)}
+  #swatches .flabel{margin:6px 0 0}
   .swatches button{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;font-size:12px;font-weight:600;color:var(--soft);padding:0}
   .swatches i{width:52px;height:52px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--line2)}
   .swatches button.on i{box-shadow:0 0 0 3px var(--ink)}
@@ -400,8 +402,8 @@
 
 <div class="overlay" id="colourSheet"><div class="sheet">
   <h3>Your handprint colour</h3>
-  <p class="sub">Every time you do the daily act, a handprint in this colour goes on the community mural.</p>
-  <div class="swatches" id="swatches"></div>
+  <p class="sub">Every time you do the daily act, a handprint in this colour goes on the community mural. Pick a skin tone or any colour you like.</p>
+  <div id="swatches"></div>
   <button class="big" id="saveColour">Save my colour</button>
 </div></div>
 
@@ -541,7 +543,8 @@
   }
 
   // ---------- Mural ----------
-  const COLOURS = [["Coral", "#E8607A"], ["Sunshine", "#F2B33D"], ["Leaf", "#4E9A2A"], ["Teal", "#0C8079"], ["Sky", "#4A90D9"], ["Lilac", "#6B5BD6"], ["Peach", "#F08A5D"], ["Berry", "#B8407A"]];
+  const COLOURS = [["Coral", "#E8607A"], ["Sunshine", "#F2B33D"], ["Leaf", "#4E9A2A"], ["Teal", "#0C8079"], ["Sky", "#4A90D9"], ["Lilac", "#6B5BD6"], ["Orange", "#F28C28"], ["Berry", "#B8407A"]];
+  const SKINS = [["Light", "#F3CFAE"], ["Medium light", "#DDB08A"], ["Medium", "#BF8A5F"], ["Medium dark", "#946140"], ["Dark", "#6B4329"], ["Deep", "#462A1B"]];
   const MURAL_GOALS = { "2026-11": 100 };  // per-month targets; raise as the community grows
   const muralGoal = () => MURAL_GOALS[monthKey(now.getFullYear(), now.getMonth())] || 500;
   const colourFor = id => COLOURS[hash(String(id || "x")) % COLOURS.length][1];
@@ -979,12 +982,17 @@
   $("seeMural").onclick = () => $("muralCard").scrollIntoView({ behavior: "smooth", block: "center" });
   function openColours() {
     pickedColour = myColour();
-    const box = $("swatches"); box.textContent = "";
-    COLOURS.forEach(([name, c]) => {
-      const b = el("button", c === pickedColour ? "on" : ""); b.type = "button";
-      const dot = el("i"); dot.style.background = c; b.append(dot, document.createTextNode(name));
-      b.onclick = () => { pickedColour = c; box.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); };
-      box.appendChild(b);
+    const wrap = $("swatches"); wrap.textContent = "";
+    [["Skin tones", SKINS, "skins"], ["Colours", COLOURS, ""]].forEach(([label, list, cls]) => {
+      wrap.append(el("p", "flabel", label));
+      const box = el("div", "swatches" + (cls ? " " + cls : ""));
+      list.forEach(([name, c]) => {
+        const b = el("button", c === pickedColour ? "on" : ""); b.type = "button";
+        const dot = el("i"); dot.style.background = c; b.append(dot, document.createTextNode(name));
+        b.onclick = () => { pickedColour = c; wrap.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); };
+        box.appendChild(b);
+      });
+      wrap.appendChild(box);
     });
     $("colourSheet").classList.add("show");
   }
