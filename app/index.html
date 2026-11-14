@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#D9F6EE">
+<title>RAOK · Random Acts of Kindness</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RAOK">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#2B2A33;--soft:#4F4B57;--muted:#6E6A75;--faint:#7A7582;--cream:#FFF8F1;--line:#ECE3DA;--line2:#E2D6CB;--chip:#F5ECE4;
+    --green:#386C1C;--green-bg:#EEF9E7;--green-line:#CFE8BF;--teal:#0C8079;--teal-ring:#2BB8AE;--teal-tint:#DDF3F1;--teal-track:#E3EFEE;--teal-dark:#0A665F;
+    --lilac:#6B5BD6;--lilac-tint:#EFEBFD;--lilac-line:#E4DEFB;--shadow:0 4px 18px rgba(60,40,30,.06)}
+  *{box-sizing:border-box}
+  html{background:var(--cream)}
+  body{margin:0;min-height:100vh;color:var(--ink);font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#D9F6EE 0,#D6F1F4 300px,var(--cream) 640px,var(--cream) 100%);padding-bottom:30px}
+  .wrap{max-width:520px;margin:0 auto;padding:18px 20px}
+  button,textarea,input{font-family:inherit}
+  button{cursor:pointer}
+  .sg{font-family:'Space Grotesk',Inter,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:10px}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .brand b{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.5px;color:var(--green);line-height:1.1}
+  .brand span{font-size:14px;color:var(--muted)}
+  .day{font-size:12px;font-weight:600;padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--soft);white-space:nowrap}
+  nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 0 12px}
+  nav button{min-height:44px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--ink);font-size:14px;font-weight:600}
+  nav button.on{background:var(--green-bg);border-color:var(--green-line);color:var(--green)}
+  .notice{font-size:13px;background:#fff;color:var(--soft);border:1px dashed var(--line2);border-radius:12px;padding:9px 12px;margin:0 0 12px}
+  .stack{display:flex;flex-direction:column;gap:12px}
+  .label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.6px}
+  .ldot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--teal-ring);flex:none}
+  .ldot.live{animation:pulse 1.8s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .card{padding:16px 18px 18px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+  /* week strip */
+  .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:10px 6px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .wd{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .wd .l{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.4px}
+  .wd .l.today{color:var(--green)}
+  .circ{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;border:2px solid var(--line);color:var(--faint)}
+  .circ.done{background:var(--teal);border-color:var(--teal);color:#fff}
+  .circ.today{border-color:var(--teal);color:var(--teal)}
+  .circ.rest{border-color:var(--lilac);border-style:dashed;color:var(--lilac);background:var(--lilac-tint)}
+  .kty{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:var(--lilac-tint);border:1px solid var(--lilac-line);color:#4A3BB0;font-size:14px;font-weight:600;line-height:1.35}
+  .kty .ic{width:32px;height:32px;border-radius:50%;background:#fff;color:var(--lilac);display:flex;align-items:center;justify-content:center;flex:none}
+  .kty small{display:block;font-weight:500;color:var(--soft);font-size:13px;margin-top:2px}
+  details.how{font-size:13px;color:var(--soft);line-height:1.45}
+  details.how summary{cursor:pointer;font-weight:600;color:var(--lilac);list-style:none}
+  details.how ul{margin:8px 0 0;padding-left:18px}
+  .pdot{width:6px;height:6px;border-radius:50%;background:transparent}
+  .pdot.on{background:var(--lilac)}
+  /* ring */
+  .ringcard{align-items:center}
+  .ringwrap{position:relative;width:200px;height:200px}
+  .ringwrap .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .ringwrap .in .s{font-size:13px;color:var(--muted)}
+  .ringwrap .in b{font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:700;letter-spacing:-1px;line-height:1}
+  #ringArc{transition:stroke-dasharray .6s ease}
+  .hubline{font-size:15px;color:var(--soft);text-align:center;line-height:1.4;margin:0}
+  .streakpill{min-height:44px;padding:0 16px;border-radius:999px;background:var(--chip);border:1px solid var(--line2);color:var(--ink);display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600}
+  .streakpill .bolt{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--teal);color:var(--teal);display:flex;align-items:center;justify-content:center}
+  /* quick actions */
+  .quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:4px 0}
+  .qa{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:var(--ink);padding:0;font-size:13px;font-weight:600}
+  .qa .c{width:60px;height:60px;border-radius:50%;background:#fff;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+  .qa.main .c{background:var(--green-bg);border-color:var(--green-line);color:var(--green)}
+  .qa.j .c{color:var(--lilac);border-color:var(--lilac-line)}
+  .qa.soon{color:var(--muted);cursor:default}
+  .qa.soon .c{border-style:dashed;color:var(--muted);box-shadow:none}
+  .qa.isdone .c{background:var(--teal);border-color:var(--teal);color:#fff}
+  /* sealed + act cards */
+  .front{display:flex;flex-direction:column;align-items:flex-start;gap:14px;width:100%;padding:16px 18px 18px;border-radius:18px;border:1.5px dashed var(--green);background:#fff;color:var(--ink);text-align:left;box-shadow:var(--shadow)}
+  .front.p{border-color:var(--lilac)}
+  .front .row2{display:flex;align-items:center;gap:14px}
+  .seal{width:52px;height:52px;border-radius:50%;background:var(--green-bg);border:1px solid var(--green-line);color:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;flex:none}
+  .front.p .seal{background:var(--lilac-tint);border-color:var(--lilac-line);color:var(--lilac)}
+  .ftitle{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;display:block}
+  .fsub{font-size:13px;color:var(--muted);display:block;margin-top:2px}
+  .front:focus-visible,button:focus-visible{outline:3px solid var(--green-line);outline-offset:2px}
+  .card.personal{border-color:var(--lilac-line)}
+  .card.personal .label{color:var(--lilac)}
+  .act{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;line-height:1.25}
+  .card.personal .act{font-size:20px;line-height:1.3}
+  .big{min-height:52px;border-radius:14px;border:1px solid var(--green-line);background:var(--green-bg);color:var(--green);font-size:16px;font-weight:700;width:100%}
+  .big.done{background:var(--teal-tint);border-color:var(--teal-tint);color:var(--teal-dark)}
+  .row{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+  .pill{min-height:44px;border-radius:12px;border:1px solid var(--line2);background:#fff;color:var(--ink);font-size:14px;font-weight:600}
+  .pill.primary{border-color:var(--green-line);background:var(--green-bg);color:var(--green);font-weight:700}
+  .card.personal .pill.primary{background:var(--lilac);border-color:var(--lilac);color:#fff}
+  .small{font-size:13px;color:var(--muted);margin:0}
+  .flabel{font-size:13px;font-weight:600;color:var(--soft);margin:0 0 6px}
+  .ok{font-size:15px;font-weight:600;color:var(--lilac);margin:0}
+  .link{background:none;border:none;padding:0;color:var(--soft);font-size:14px;font-weight:600;text-decoration:underline;align-self:flex-start}
+  textarea,input[type=text]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--cream);color:var(--ink);font-size:15px;resize:none}
+  textarea:focus,input:focus{outline:3px solid var(--green-line);border-color:var(--green)}
+  /* challenge */
+  .chtop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .tag{font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--lilac-line);color:#4A3BB0}
+  .chtitle{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700}
+  .bar{position:relative;height:32px;display:flex;align-items:center}
+  .bar .track{position:absolute;left:0;right:0;height:8px;border-radius:999px;background:var(--teal-track)}
+  .bar .fill{position:absolute;left:0;height:8px;border-radius:999px;background:var(--teal);transition:width .5s}
+  .mile{position:absolute;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;background:var(--chip);border:1px solid var(--line2);color:var(--soft);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .mile.hit{background:var(--teal);border-color:var(--teal);color:#fff}
+  .mile.end{transform:translateX(-100%)}
+  /* stories */
+  .sechead{display:flex;align-items:baseline;justify-content:space-between;padding-top:10px}
+  h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700}
+  .sechead span{font-size:13px;color:var(--muted)}
+  .story{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow)}
+  .story .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .story .when{font-size:13px;color:var(--muted)}
+  .story .text{font-size:15px;line-height:1.4}
+  /* you */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tile{padding:16px 12px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:4px}
+  .tile .t{font-size:13px;color:var(--muted)}
+  .tile b{font-family:'Space Grotesk',sans-serif;font-size:48px;font-weight:700;line-height:1.05}
+  .tile .u{font-size:12px;color:var(--muted)}
+  #curStreak{color:var(--teal)}
+  .nudge{min-height:48px;padding:10px 16px;border-radius:999px;background:var(--teal-tint);border:1px solid var(--teal-ring);color:var(--teal-dark);display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+  .mhead{display:flex;align-items:center;gap:12px}
+  .mhead .ic{width:44px;height:44px;border-radius:50%;background:var(--teal-tint);color:var(--teal);display:flex;align-items:center;justify-content:center;flex:none}
+  .mhead b{font-family:'Space Grotesk',sans-serif;font-size:17px;display:block}
+  .mhead span{font-size:14px;color:var(--soft)}
+  .calhead{display:flex;align-items:center;justify-content:space-between}
+  .calhead b{font-family:'Space Grotesk',sans-serif;font-size:18px}
+  .navb{width:44px;height:44px;border-radius:50%;border:none;background:none;color:var(--teal);display:flex;align-items:center;justify-content:center}
+  .navb:disabled{color:#C9C4CC;cursor:default}
+  .dow,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));column-gap:6px;text-align:center}
+  .dow{font-size:12px;font-weight:600;color:var(--muted)}
+  .cal{row-gap:8px;justify-items:center}
+  .cd{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .cd .circ{width:36px;height:36px;font-size:14px}
+  .legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .entry{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:16px;border:1px solid var(--lilac-line);background:#fff;box-shadow:var(--shadow)}
+  .entry .d{color:var(--lilac)} .entry .d .ldot{background:var(--lilac)}
+  .entry .a{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;line-height:1.3}
+  .entry .t{font-size:15px;line-height:1.4;color:var(--soft)}
+  .empty{color:var(--muted);text-align:center;padding:26px 10px;font-size:14px;border:1px dashed var(--line2);border-radius:16px;background:rgba(255,255,255,.6)}
+  /* sheets */
+  .levels{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+  .level{text-align:left;padding:14px 16px;border-radius:16px;background:#fff;border:1px solid var(--line2);color:var(--ink)}
+  .level b{display:block;font-family:'Space Grotesk',sans-serif;font-size:17px}
+  .level span{font-size:13px;color:var(--muted)}
+  .level.on{border-color:var(--green);background:var(--green-bg)}
+  .overlay{position:fixed;inset:0;background:rgba(43,42,51,.4);display:none;align-items:flex-end;justify-content:center;z-index:10}
+  .overlay.show{display:flex}
+  .sheet{background:var(--cream);color:var(--ink);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 20px calc(28px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+  .sheet h3{margin:0 0 6px;font-family:'Space Grotesk',sans-serif;font-size:22px}
+  .sub{color:var(--muted);margin:0 0 6px;font-size:14px;line-height:1.45}
+  .sheet img{width:100%;border-radius:16px;display:block;margin:12px 0;border:1px solid var(--line)}
+  .deal{transition:transform .22s ease-in}
+  .deal.flip-out{transform:perspective(900px) rotateY(90deg)}
+  .deal.flip-in{animation:flipIn .3s ease-out}
+  @keyframes flipIn{from{transform:perspective(900px) rotateY(-90deg)}to{transform:perspective(900px) rotateY(0)}}
+  .act .hl{display:block;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;line-height:1.2}
+  .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
+  .card.personal .act .hl{font-size:21px}
+  .feel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+  .feel button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border-radius:12px;border:1px solid var(--line2);background:#fff;font-size:10px;font-weight:600;color:var(--soft);min-height:64px;letter-spacing:-.2px}
+  .feel button span{font-size:24px;line-height:1}
+  .feel button.on{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-dark)}
+  .proof{font-size:13px;line-height:1.45;color:var(--teal-dark);background:var(--teal-tint);border-radius:12px;padding:10px 12px;margin:0}
+  .intro .dots{display:flex;gap:6px;justify-content:center;margin:14px 0 4px}
+  .intro .dots i{width:8px;height:8px;border-radius:50%;background:var(--line2)}
+  .intro .dots i.on{background:var(--green);width:20px;border-radius:4px}
+  .intro .big-ic{width:72px;height:72px;border-radius:50%;background:var(--green-bg);border:1px solid var(--green-line);color:var(--green);display:flex;align-items:center;justify-content:center;margin:6px auto 12px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px}
+  .intro h3{text-align:center}
+  .intro .sub{text-align:center}
+  .why{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+  .why button{text-align:left;padding:13px 16px;border-radius:14px;border:1px solid var(--line2);background:#fff;font-size:15px;font-weight:600;color:var(--ink)}
+  .why button.on{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+  .ver{font-size:12px;color:var(--muted);text-align:center;margin:6px 0 0}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><b>RAOK</b><span>Random Acts of Kindness</span></div>
+    <div class="day" id="dateLabel"></div>
+  </header>
+  <nav>
+    <button data-v="today" class="on">Community</button>
+    <button data-v="you">You</button>
+  </nav>
+  <div id="notice" class="notice hidden"></div>
+
+  <!-- COMMUNITY HUB -->
+  <section id="view-today" class="stack">
+    <div class="week" id="week"></div>
+    <div class="kty hidden" id="ktyBanner"><span class="ic"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-9 6-15 15-16-1 9-7 15-15 16z"/><path d="M5 20l9-9"/></svg></span><span id="ktyBannerText"></span></div>
+
+    <div class="card ringcard">
+      <div class="label" style="align-self:flex-start"><span class="ldot live"></span><span id="liveLabel">Live today · community goal</span></div>
+      <div class="ringwrap">
+        <svg aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#E3EFEE" stroke-width="14"/><circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="#2BB8AE" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 540" transform="rotate(-90 100 100)"/></svg>
+        <div class="in"><span class="s">Acts today</span><b id="count">0</b><span class="s" id="goalLine">/ 10</span></div>
+      </div>
+      <p class="hubline" id="hubline"></p>
+      <button class="streakpill" id="streakPill">
+        <span class="bolt"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span>
+        <span id="streakPillText">Start your streak</span>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+    <div class="quick">
+      <button class="qa main" id="qaDid"><span class="c"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span id="qaDidText">I did it</span></button>
+      <button class="qa" id="qaStory"><span class="c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><span>Share story</span></button>
+      <button class="qa j" id="qaJournal"><span class="c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><span>Journal</span></button>
+      <button class="qa soon" aria-disabled="true" title="Coming soon"><span class="c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span>Chains · soon</span></button>
+    </div>
+
+    <div class="deal" id="cCard">
+      <button class="front" id="cFront">
+        <span class="label">Today's act · everyone</span>
+        <span class="row2"><span class="seal">?</span><span><span class="ftitle">Tap to reveal</span><span class="fsub">Everyone gets the same act today</span></span></span>
+      </button>
+      <div class="card hidden" id="cBack">
+        <span class="label">Today's act · everyone</span>
+        <div class="act" id="communityAct"></div>
+        <button class="big" id="didIt">I did it</button>
+        <div id="afterDone" class="stack hidden">
+          <p class="proof">Research shows the person you helped probably felt even better than you think.</p>
+          <div><p class="flabel">How did it feel? Only you see this.</p><div class="feel" data-feel="c"></div></div>
+          <label><p class="flabel">Share what happened (optional, others will see it)</p>
+          <textarea id="note" rows="2" maxlength="140" placeholder="e.g. Told the bus driver they made my morning"></textarea></label>
+          <div class="row">
+            <button class="pill" id="saveNote">Share story</button>
+            <button class="pill primary" id="shareCard">Make share card</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="deal" id="pCard">
+      <button class="front p" id="pFront">
+        <span class="label">Just for you · private</span>
+        <span class="row2"><span class="seal"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span><span class="ftitle">Sealed for you</span><span class="fsub">Nobody else sees this one</span></span></span>
+      </button>
+      <div class="card personal hidden" id="pBack">
+        <span class="label">Just for you · private</span>
+        <div class="act" id="personalAct"></div>
+        <div id="personalButtons" class="row">
+          <button class="pill primary" id="pDone">Done</button>
+          <button class="pill" id="pSwap">Swap it</button>
+          <button class="pill" id="pSkip">Not today</button>
+        </div>
+        <div id="personalAfter" class="stack hidden">
+          <p class="ok" id="personalMsg"></p>
+          <div id="pFeelBox"><p class="flabel">How did it feel?</p><div class="feel" data-feel="p"></div></div>
+          <div id="journalBox" class="stack">
+            <label><p class="flabel">Anything you want to remember? Only you can see this.</p>
+            <textarea id="journal" rows="3" maxlength="600"></textarea></label>
+            <button class="pill primary" id="saveJournal">Save to my journal</button>
+          </div>
+          <button class="link" id="pUndo">Undo</button>
+        </div>
+        <p class="small">Skipping never breaks your streak.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="chtop"><span class="tag">Monthly challenge</span><span class="small" id="chLeft"></span></div>
+      <div class="chtitle" id="chTitle"></div>
+      <div style="font-size:14px;color:var(--soft)" id="chCount"></div>
+      <div class="bar" id="chBar"><div class="track"></div><div class="fill" id="chFill"></div></div>
+      <p class="small">Every daily act and personal act counts.</p>
+    </div>
+
+    <div class="sechead"><h2>Today's stories</h2><span id="storiesTag">Live</span></div>
+    <p class="small" id="storiesSub"></p>
+    <div id="stories" class="stack"></div>
+  </section>
+
+  <!-- YOU -->
+  <section id="view-you" class="stack hidden">
+    <div class="tiles">
+      <div class="tile"><span class="t">Current streak</span><b id="curStreak">0</b><span class="u">days</span></div>
+      <div class="tile"><span class="t">Longest streak</span><b id="bestStreak">0</b><span class="u">days</span></div>
+    </div>
+    <div class="kty" id="ktyBank"><span class="ic"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-9 6-15 15-16-1 9-7 15-15 16z"/><path d="M5 20l9-9"/></svg></span><span><span id="ktyBankText"></span><small id="ktyBankSub"></small></span></div>
+    <details class="how"><summary>How Be Kind To Yourself days work</summary><ul><li>Every 7 days in a row earns you one. You can save up to 2.</li><li>Miss a day and one is used automatically, so your streak stays safe.</li><li>Taking a break is kindness too. No guilt, ever.</li></ul></details>
+    <div class="nudge"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><span id="nudgeText"></span></div>
+
+    <div class="card">
+      <div class="mhead"><span class="ic"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span><div><b>Streak milestones</b><span id="mileText"></span></div></div>
+      <div class="bar" id="mileBar"><div class="track"></div><div class="fill" id="mileFill"></div></div>
+    </div>
+
+    <div class="card" style="padding:16px 14px 18px">
+      <div class="calhead">
+        <button class="navb" id="calPrev" aria-label="Previous month"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <b id="calTitle"></b>
+        <button class="navb" id="calNext" aria-label="Next month"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div class="cal" id="cal"></div>
+      <div class="legend"><span><span class="circ done" style="width:12px;height:12px;border-width:0"></span>Community act</span><span><span class="pdot on"></span>Personal act</span><span><span class="circ rest" style="width:12px;height:12px;border-width:1.5px"></span>Be Kind To Yourself day</span></div>
+    </div>
+
+    <div class="sechead"><h2>My journal</h2><span>Private</span></div>
+    <div id="journalList" class="stack"></div>
+
+    <div class="card" style="margin-top:8px">
+      <span class="label">Settings</span>
+      <p class="small" id="settingsLine" style="color:var(--soft)"></p>
+      <div class="row"><button class="pill" id="changeLevel">Comfort level</button><button class="pill" id="changeTown">Change town</button></div>
+      <button class="link" id="resetApp">Start again from scratch</button>
+    </div>
+    <p class="ver">RAOK web app · early version · your progress is saved on this phone</p>
+  </section>
+</div>
+
+<!-- Intro -->
+<div class="overlay intro" id="intro"><div class="sheet">
+  <div id="introBody"></div>
+  <div class="dots" id="introDots"></div>
+  <button class="big" id="introNext" style="margin-top:12px">Next</button>
+</div></div>
+
+<!-- Onboarding / settings sheet -->
+<div class="overlay" id="setup"><div class="sheet">
+  <h3 id="setupTitle">Your personal acts</h3>
+  <p class="sub" id="setupIntro">How far would you like your personal acts to push you? You can change this any time.</p>
+  <div class="levels" id="levels">
+    <button class="level" data-l="gentle"><b>Gentle</b><span>Small, cosy acts with people you know</span></button>
+    <button class="level" data-l="stretch"><b>A bit of a stretch</b><span>Talking to people you don't know well</span></button>
+    <button class="level" data-l="bold"><b>Bold</b><span>Bigger acts, still always kind and safe</span></button>
+  </div>
+  <p class="sub">Your town (optional). Only the town is shown, never anything more exact.</p>
+  <input type="text" id="townInput" maxlength="40" placeholder="e.g. Leeds">
+  <button class="big" id="setupSave" style="margin-top:16px">Let's go</button>
+</div></div>
+
+<!-- Share card sheet -->
+<div class="overlay" id="cardSheet"><div class="sheet">
+  <h3>Your share card</h3>
+  <p class="sub">Press and hold the image to save it, then post it anywhere.</p>
+  <img id="cardImg" alt="Share card">
+  <div class="row"><button class="pill" id="copyText">Copy text</button><button class="pill primary" id="closeCard">Done</button></div>
+</div></div>
+
+<script>
+(() => {
+  // ---------- Act libraries ----------
+  // [id, headline, personal line, type, level]  (generated from the RAOK Acts Library)
+  const LIB = [["C01", "Hold the door, with a smile", "You're through the door and someone's a few steps behind. Wait the extra second and smile.", "Strangers", "c"], ["C02", "Compliment a stranger's style", "How many times have you spotted a great coat or a lovely dog and said nothing? Today, tell them.", "Strangers", "c"], ["C03", "Let someone go first", "You're in a queue and the person behind has one item. Wave them ahead.", "Strangers", "c"], ["C04", "Thank the people who keep things moving", "Bus drivers, cashiers and couriers hear complaints all day. Say thanks, by name if you can.", "Strangers", "c"], ["C05", "Review a small local business", "Think of a little shop or café you love. A kind review could make the owner's week.", "Online", "c"], ["C06", "Tell someone you're glad they exist", "There's someone you're lucky to have and haven't told lately. Send them a message now.", "Family & friends", "c"], ["C07", "Pick up one piece of litter", "You've walked past that wrapper a hundred times. Today, pick it up, even though it isn't yours.", "Planet", "c"], ["C08", "Drop your change in a charity box", "That loose change rattling in your pocket could do some good. Pop it in the next charity box.", "Neighbours & community", "c"], ["C09", "Make an unasked-for cuppa", "Someone near you would love a tea and won't ask. Put the kettle on for them.", "Family & friends", "c"], ["C10", "Text an old friend", "Someone popped into your head this week and you didn't message. Send \"Thinking of you\" now.", "Family & friends", "c"], ["C11", "Give someone your full attention", "Next time someone talks to you, put your phone away and really listen. They'll notice.", "Family & friends", "c"], ["C12", "Tell a colleague they did well", "You've noticed someone's good work and kept it to yourself. Tell them what you liked.", "Work & school", "c"], ["C13", "Thank your postie or bin crew", "They turn up whatever the weather, and rarely hear thanks. Leave a note for them today.", "Gratitude", "c"], ["C14", "Shout out a small business", "You've got a favourite local shop or maker. Share them on social media so others find them too.", "Online", "c"], ["C15", "Offer to carry something", "You'll see someone juggling bags or a buggy today. Ask if they'd like a hand.", "Strangers", "c"], ["C16", "Say good morning to a neighbour", "Most of us just nod and walk on. Today, say a proper good morning.", "Neighbours & community", "c"], ["C17", "Return a stray trolley", "Someone left a trolley in the car park again. Take it back so the next person doesn't have to.", "Strangers", "c"], ["C18", "Add to the food bank box", "You've walked past the food bank box at the supermarket. Pop one extra item in today.", "Neighbours & community", "c"], ["C19", "Thank someone who helped you", "Someone did you a favour recently and moved on. Send a proper thank-you message.", "Gratitude", "c"], ["C20", "Let a car out", "There's always someone waiting to pull out at a busy junction. Today, let them in.", "Strangers", "c"], ["C21", "Ask how someone's really doing", "\"Fine, thanks\" is the usual answer. Ask again, gently, and give them time to answer properly.", "Family & friends", "c"], ["C22", "Hold the lift", "You can hear someone hurrying for the lift. Press the button and wait for them.", "Strangers", "c"], ["C23", "Recommend something they'll love", "You've just enjoyed a book, song or film that's perfect for someone. Tell them about it.", "Family & friends", "c"], ["C24", "Compliment someone at home", "Family hear our complaints far more than our praise. Tell one of them something you admire.", "Family & friends", "c"], ["C25", "Leave a book for a stranger", "You've got a book you've finished with. Leave it somewhere for someone to discover.", "Neighbours & community", "c"], ["C26", "Tidy a shared space", "The office kitchen, the hallway, the park bench: leave it nicer than you found it.", "Neighbours & community", "c"], ["C27", "Thank everyone who serves you", "Every till, counter and checkout today, say a proper thank you and mean it.", "Gratitude", "c"], ["C28", "Send a voice note", "A text is quick, but hearing your voice means more. Send someone you love a voice note.", "Family & friends", "c"], ["C29", "Check in on someone alone", "Think of someone who lives on their own. A quick knock or call could brighten their day.", "Neighbours & community", "c"], ["C30", "Reassure a struggling parent", "You've seen a parent with a toddler in full meltdown. Tell them kindly they're doing great.", "Strangers", "c"], ["C31", "Leave a kind comment", "You scroll past posts that make you smile every day. Today, tell the person who shared one.", "Online", "c"], ["C32", "Thank a teacher, nurse or carer", "They look after others all day and rarely hear thanks. Tell one what they mean to you.", "Gratitude", "c"], ["C33", "Bring in a treat to share", "Biscuits, fruit or cake: a small treat in the staff room or classroom lifts everyone.", "Work & school", "c"], ["C34", "Give up your seat", "Someone gets on who needs a seat more than you. Offer yours before they have to ask.", "Strangers", "c"], ["C35", "Skip the single-use plastic", "Your reusable bag or cup is probably at home again. Take it with you today.", "Planet", "c"], ["C36", "Plant or water something to share", "A shared plant drooping or an empty pot by the door? Give it some love for everyone.", "Planet", "c"], ["C37", "Offer a colleague a hand", "Someone near you looks swamped. Ask if there's anything you can take off their plate.", "Work & school", "c"], ["C38", "Tip a little extra", "Someone works hard to look after you today. Leave a bit more, or a kind note with it.", "Strangers", "c"], ["C39", "Share a happy memory", "There's a photo on your phone that will make a friend smile. Send it to them.", "Family & friends", "c"], ["C40", "Learn someone's name", "There's someone you see every day but don't know their name. Ask, and use it.", "Neighbours & community", "c"], ["C41", "Praise someone behind their back", "Say something kind about someone when they're not there. It has a way of reaching them.", "Work & school", "c"], ["C42", "Donate what you don't use", "There's a bag of clothes or toys you keep meaning to sort. Give it to a charity shop.", "Neighbours & community", "c"], ["C43", "Thank someone online", "A video, article or post helped you once. Tell the person who made it.", "Online", "c"], ["C44", "Help someone who's lost", "You'll spot someone peering at their phone, looking lost. Ask if you can help.", "Strangers", "c"], ["C45", "Make someone a meal or a cuppa", "Someone near you has had a long day. Feed them, or at least put the kettle on.", "Family & friends", "c"], ["C46", "Leave the best space for someone else", "There's a perfect parking spot right by the door. Leave it for someone who needs it more.", "Strangers", "c"], ["C47", "Do a five-minute litter pick", "Grab a bag and spend five minutes clearing your street. You'll notice the difference.", "Planet", "c"], ["C48", "Offer to take the group photo", "You've seen friends struggling to fit everyone in a selfie. Offer to take it for them.", "Strangers", "c"], ["C49", "Reply to that message", "There's a message you've been meaning to answer for days. Reply to it now.", "Family & friends", "c"], ["C50", "Give credit out loud", "Someone helped make something good happen. Mention it in front of others.", "Work & school", "c"], ["C51", "Leave an encouraging note", "A sticky note on a mirror or desk can make someone's morning. Write one.", "Family & friends", "c"], ["C52", "Tell a shop worker they helped", "Someone in a shop went out of their way for you. Tell them you appreciated it.", "Gratitude", "c"], ["C53", "Cook extra for a neighbour", "You're cooking anyway. Make a little more and share it with someone next door.", "Neighbours & community", "c"], ["C54", "Be patient with someone", "Someone ahead of you is slow or struggling. Take a breath and give them time.", "Strangers", "c"], ["C55", "Include someone on their own", "There's always someone at the edge of the group. Bring them into the conversation.", "Work & school", "c"], ["C56", "Share what you know", "You know something that would help someone who's learning. Show them how.", "Work & school", "c"], ["C57", "Switch off and save energy", "Lights on in empty rooms, chargers left plugged in: switch them off today.", "Planet", "c"], ["C58", "Wish someone good luck", "Someone you know has an interview, exam or big day coming up. Send them good luck.", "Family & friends", "c"], ["C59", "Thank a parent or carer", "Think of something specific a parent, grandparent or carer did for you. Tell them.", "Gratitude", "c"], ["C60", "Ask an older person their story", "Older people have amazing stories that no one asks about. Ask, and really listen.", "Neighbours & community", "c"], ["P01", "Tell someone why you love them", "Write down three things you love about someone close to you. Then tell them one.", "Family & friends", "gentle"], ["P02", "Ring a grandparent for a chat", "Not because you need anything, just to chat. It'll mean more to them than you know.", "Family & friends", "gentle"], ["P03", "Treat a neighbour", "Bake or buy a little something for a neighbour. It's a lovely surprise on the doorstep.", "Neighbours & community", "gentle"], ["P04", "Send a handwritten card", "Texts are quick, but a card in the post gets kept. Write one to someone.", "Gratitude", "gentle"], ["P05", "Help with that job they keep putting off", "A friend has a job hanging over them. Offer your time and do it together.", "Family & friends", "gentle"], ["P06", "Message someone you've lost touch with", "There's someone you used to be close to. A simple \"How are you?\" could reopen the door.", "Family & friends", "gentle"], ["P07", "Leave a note for a stranger", "Write something encouraging and leave it where a stranger will find it today.", "Strangers", "gentle"], ["P08", "Thank a teacher or mentor", "Think of someone who believed in you early on. Tell them how they helped.", "Gratitude", "gentle"], ["P09", "Cook for someone having a hard week", "Someone you know is struggling. A homemade meal says \"I'm here\" without words.", "Family & friends", "gentle"], ["P10", "Make a friend a playlist", "Pick songs that remind you of them, or that they'd love. Send it with a note.", "Family & friends", "gentle"], ["P11", "Treat a friend to a coffee", "Next time you meet a friend, get the coffees in. Just because.", "Family & friends", "gentle"], ["P12", "Help someone learn something", "Someone's trying to learn a new skill. Give them 20 minutes of your help.", "Work & school", "gentle"], ["P13", "Write a thank-you letter", "There's someone who changed things for you who's never heard you say it. They'll love it more than you expect.", "Gratitude", "gentle"], ["P14", "Do a job someone else always does", "Someone at home always empties the bins or does the dishes. Do it before they can.", "Family & friends", "gentle"], ["P15", "Send a care package", "Someone you love lives far away. Post them a little box of things that will make them smile.", "Family & friends", "gentle"], ["P16", "Start a real conversation with a neighbour", "You nod to them every day but don't really know them. Stop and chat today.", "Neighbours & community", "stretch"], ["P17", "Sit with someone eating alone", "There's someone eating on their own at work or college. Ask if you can join them.", "Work & school", "stretch"], ["P18", "Ring, don't text", "There's a friend you've drifted from. Skip the text and call. Hearing your voice matters.", "Family & friends", "stretch"], ["P19", "Pay for the next person's drink", "At the café till, pay for the drink of the person behind you. Let it be a surprise.", "Strangers", "stretch"], ["P20", "Run an errand for an older neighbour", "An older neighbour might struggle to get to the shop. Ask if they need anything.", "Neighbours & community", "stretch"], ["P21", "Introduce yourself", "There's someone new at work, the gym or the school gates. Be the first to say hello.", "Neighbours & community", "stretch"], ["P22", "Make that apology", "You've been carrying something you want to say sorry for. Today's the day.", "Family & friends", "stretch"], ["P23", "Tell a stranger what you admire", "You've noticed something genuinely impressive about a stranger. Tell them.", "Strangers", "stretch"], ["P24", "Help on public transport", "Someone's struggling with bags, a buggy or their balance. Offer your seat or a hand.", "Strangers", "stretch"], ["P25", "Give an hour to a local cause", "There's a charity or community group near you that needs help. Give them an hour.", "Neighbours & community", "stretch"], ["P26", "Compliment someone in front of others", "Praise in private is lovely. Praise in front of others is even better. Try it today.", "Work & school", "stretch"], ["P27", "Reach out to someone struggling", "You know someone's going through a tough time. Get in touch and let them know you care.", "Family & friends", "stretch"], ["P28", "Read your thank-you letter to them", "Reading it out, in person or on a call, is the most powerful kind of thank you. You can do it.", "Gratitude", "stretch"], ["P29", "Give a friend a break", "A friend with kids or a dog could use some time off. Offer to babysit or walk the dog.", "Family & friends", "stretch"], ["P30", "Write someone a glowing review", "Someone did great work for you. Write them a review or a reference that says so.", "Work & school", "stretch"], ["P31", "Host a neighbour get-together", "Plenty of people on your street have never really met. Bring them together, even for an hour.", "Neighbours & community", "bold"], ["P32", "Give blood or sign up as a donor", "An hour of your time could save someone's life. Book in today.", "Neighbours & community", "bold"], ["P33", "Volunteer somewhere new", "Pick a cause you care about and spend an afternoon helping out.", "Neighbours & community", "bold"], ["P34", "Buy someone sleeping rough a hot drink", "Get them a drink and some food, and chat if they'd like. Being seen matters too.", "Strangers", "bold"], ["P35", "Mend a friendship", "There's a friendship you let go. Send the first message. It's braver than it feels.", "Family & friends", "bold"], ["P36", "Mentor someone starting out", "Remember being new? Offer your experience to someone just beginning in your line of work.", "Work & school", "bold"], ["P37", "Take on a sponsored challenge", "Choose a cause you care about and sign up for a challenge to raise money.", "Neighbours & community", "bold"], ["P38", "Visit someone who gets few visitors", "Someone in a care home or hospital rarely has visitors. Spend some time with them.", "Neighbours & community", "bold"], ["P39", "Post a public thank-you", "Someone changed your life for the better. Tell the world, and tag them if you can.", "Gratitude", "bold"], ["P40", "Clear a small debt for someone", "A school dinner bill or library fine can weigh on a family. Quietly pay one off.", "Neighbours & community", "bold"], ["P41", "Invite someone lonely for a cuppa", "Someone looks like they could use company. Ask if they'd like to join you for a cuppa.", "Strangers", "bold"], ["P42", "Leave a generous tip and a note", "Someone is working a tough shift. Leave a generous tip and a note saying you noticed.", "Strangers", "bold"], ["P43", "Deliver a thank-you letter in person", "Take your letter to someone who changed your life and read it to them. It's unforgettable.", "Gratitude", "bold"], ["P44", "Start a kindness project", "Start something kind at work, school or on your street, and invite others to join in.", "Neighbours & community", "bold"], ["P45", "Have a Big Kind Day", "Do five acts of kindness in one day. Research shows that's when you feel the biggest boost.", "Neighbours & community", "bold"]];
+  const COMMUNITY = LIB.filter(a => a[4] === "c").map(a => ({ id: a[0], h: a[1], l: a[2], type: a[3] }));
+  const PERSONAL = { gentle: [], stretch: [], bold: [] };
+  LIB.filter(a => a[4] !== "c").forEach(a => PERSONAL[a[4]].push({ id: a[0], h: a[1], l: a[2], type: a[3] }));
+  const LETTER = { gentle: "P13", stretch: "P28", bold: "P43" };
+
+  // ---------- Dates ----------
+  const now = new Date();
+  const dayNum = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
+  const dateOf = n => new Date(n * 864e5).toISOString().slice(0, 10);
+  const numOf = s => Math.floor(Date.parse(s + "T00:00:00Z") / 864e5);
+  const TODAY = dateOf(dayNum);
+  const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  // Same act for everyone each day, never the same type two days running.
+  const basePick = n => COMMUNITY[hash("community" + dateOf(n)) % COMMUNITY.length];
+  function pickCommunity(n) {
+    const prevType = basePick(n - 1).type;
+    let i = hash("community" + dateOf(n)) % COMMUNITY.length;
+    for (let k = 0; k < COMMUNITY.length && COMMUNITY[i].type === prevType; k++) i = (i + 1) % COMMUNITY.length;
+    return COMMUNITY[i];
+  }
+  const communityAct = pickCommunity(dayNum);
+
+  // ---------- State ----------
+  const LS = "raok_v1";
+  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "" });
+  const blankPub = () => ({ last: "", note: "", town: "", days: {}, at: 0 });
+  let priv = blankPriv(), pub = blankPub();
+  let todayDocs = [];
+  let shared = false;
+  let db = null, uid = null, writing = Promise.resolve();
+  let calY = now.getFullYear(), calM = now.getMonth();
+
+  const loadLocal = () => { try { const v = JSON.parse(localStorage.getItem(LS) || "null"); if (v) { priv = Object.assign(blankPriv(), v.priv); pub = Object.assign(blankPub(), v.pub); } } catch (e) {} };
+  const saveLocal = () => { try { localStorage.setItem(LS, JSON.stringify({ priv, pub })); } catch (e) {} };
+
+  const $ = id => document.getElementById(id);
+  const notice = msg => { const n = $("notice"); if (!msg) { n.classList.add("hidden"); return; } n.textContent = msg; n.classList.remove("hidden"); };
+
+  function persist(which) {
+    saveLocal();
+    if (!shared) return;
+    writing = writing.then(async () => {
+      try {
+        if (which !== "pub") await db.doc("data/users/" + uid + "/state").set(JSON.parse(JSON.stringify(priv)));
+        if (which !== "priv") await db.collection("done").doc(uid).set(JSON.parse(JSON.stringify(pub)));
+      } catch (e) {
+        shared = false;
+        notice("You can use the app, but your acts are only saved on this device. Ask Jacob to invite you as an editor to join the shared count.");
+        render();
+      }
+    });
+  }
+
+  function personalAct() {
+    const lvl = priv.level || "gentle", list = PERSONAL[lvl];
+    const swaps = priv.swaps[TODAY] || 0;
+    if (now.getDate() === 1 && !swaps) return list.find(a => a.id === LETTER[lvl]) || list[0]; // monthly thank-you letter
+    return list[(hash((priv.seed || "me") + TODAY) + swaps) % list.length];
+  }
+
+  // ---------- Derived ----------
+  // Streak with "Be Kind To Yourself" days, worked out from act history (same result on every device).
+  function streakInfo() {
+    const nums = Object.keys(pub.days).map(numOf).sort((a, b) => a - b);
+    const info = { streak: 0, best: 0, bank: 1, rest: new Set(), earnedToday: false };
+    if (!nums.length) return info;
+    const has = new Set(nums);
+    let run = 0, bank = 1, best = 0;
+    for (let n = nums[0]; n < dayNum; n++) {
+      if (has.has(n)) { run++; best = Math.max(best, run); if (run % 7 === 0 && bank < 2) bank++; }
+      else if (run > 0 && bank > 0) { bank--; info.rest.add(n); }
+      else run = 0;
+    }
+    if (has.has(dayNum)) { run++; best = Math.max(best, run); if (run % 7 === 0 && bank < 2) { bank++; info.earnedToday = true; } }
+    info.streak = run; info.best = best; info.bank = bank;
+    return info;
+  }
+  function count() { return shared ? todayDocs.length : (pub.days[TODAY] ? 1 : 0); }
+  function goalFor(c) { const steps = [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]; return steps.find(s => s > c) || (Math.ceil((c + 1) / 100000) * 100000); }
+  const monthKey = (y, m) => y + "-" + String(m + 1).padStart(2, "0");
+  function actsThisMonth() {
+    const k = monthKey(now.getFullYear(), now.getMonth());
+    const c = Object.keys(pub.days).filter(d => d.startsWith(k)).length;
+    const p = Object.keys(priv.personal).filter(d => d.startsWith(k) && priv.personal[d] === "done").length;
+    return c + p;
+  }
+  function ago(at) {
+    if (typeof at !== "number" || !at) return "";
+    const m = Math.max(0, Math.round((Date.now() - at) / 60000));
+    if (m < 1) return "just now";
+    if (m < 60) return m + " min ago";
+    const hrs = Math.round(m / 60); return hrs + (hrs === 1 ? " hour ago" : " hours ago");
+  }
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  function fillBar(barId, fillId, marks, value, maxVal) {
+    const bar = $(barId); bar.querySelectorAll(".mile").forEach(m => m.remove());
+    $(fillId).style.width = Math.min(100, value / maxVal * 100) + "%";
+    marks.forEach((m, i) => {
+      const s = el("span", "mile" + (value >= m.at ? " hit" : "") + (i === marks.length - 1 ? " end" : ""), value >= m.at ? "✓" : String(m.label));
+      s.style.left = (m.pos != null ? m.pos : m.at / maxVal * 100) + "%";
+      bar.appendChild(s);
+    });
+  }
+
+  function setAct(id, a) {
+    const box = $(id); box.textContent = "";
+    box.append(el("span", "hl", a.h), el("span", "pl", a.l));
+  }
+  const FEELS = [["😍", "Wonderful"], ["😊", "Happy"], ["🙂", "Good"], ["😐", "Okay"], ["😬", "Awkward"]];
+  function renderFeel(box) {
+    const key = TODAY + ":" + box.dataset.feel, cur = (priv.feel || {})[key];
+    box.textContent = "";
+    FEELS.forEach(([e, name]) => {
+      const b = el("button", cur === name ? "on" : ""); b.type = "button";
+      b.append(el("span", null, e), document.createTextNode(name));
+      b.onclick = () => { priv.feel = priv.feel || {}; priv.feel[key] = name; persist("priv"); render(); };
+      box.appendChild(b);
+    });
+  }
+
+  // ---------- Render ----------
+  function render() {
+    const SI = streakInfo();
+    $("dateLabel").textContent = now.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+    setAct("communityAct", communityAct);
+
+    // week strip (Mon–Sun)
+    const monday = dayNum - ((now.getDay() + 6) % 7);
+    const wk = $("week"); wk.textContent = "";
+    ["M", "T", "W", "T", "F", "S", "S"].forEach((l, i) => {
+      const n = monday + i, d = dateOf(n), isToday = n === dayNum;
+      const box = el("div", "wd");
+      box.append(el("span", "l" + (isToday ? " today" : ""), isToday ? "TODAY" : l));
+      box.append(el("span", "circ" + (pub.days[d] ? " done" : (SI.rest.has(n) ? " rest" : (isToday ? " today" : ""))), String(new Date(n * 864e5).getUTCDate())));
+      box.append(el("span", "pdot" + (priv.personal[d] === "done" ? " on" : "")));
+      wk.appendChild(box);
+    });
+
+    // ring
+    const c = count(), goal = goalFor(c);
+    $("count").textContent = c.toLocaleString("en-GB");
+    $("goalLine").textContent = "/ " + goal.toLocaleString("en-GB");
+    $("ringArc").setAttribute("stroke-dasharray", (540 * Math.min(1, c / goal)).toFixed(1) + " 540");
+    $("ringArc").style.opacity = c ? 1 : 0;
+    const towns = new Set(todayDocs.map(d => d.town).filter(Boolean));
+    $("liveLabel").textContent = shared ? "Live today · community goal" : "Preview · community goal";
+    $("hubline").textContent = !shared ? (c ? "That's you counted! The whole community's count goes live once accounts are switched on." : "Do today's act to get counted. The whole community's count goes live once accounts are switched on.") : c === 0 ? "Nobody has ticked off today's act yet. Be the first!" :
+      (c === 1 ? "1 person has" : c.toLocaleString("en-GB") + " people have") + " been kind today" + (towns.size >= 2 ? ", across " + towns.size + " towns" : "") + ". Let's reach " + goal.toLocaleString("en-GB") + ".";
+    const st = SI.streak;
+    $("streakPillText").textContent = (st ? st + " day streak" : "Start your streak today") + (SI.bank ? " · " + SI.bank + " saved" : "");
+    const usedYesterday = SI.rest.has(dayNum - 1) && st > 0;
+    $("ktyBanner").classList.toggle("hidden", !(usedYesterday || SI.earnedToday));
+    $("ktyBannerText").textContent = SI.earnedToday ? "7 days in a row! You've earned a Be Kind To Yourself day." :
+      "Yesterday was a Be Kind To Yourself day. Your " + st + "-day streak is safe.";
+
+    const did = !!pub.days[TODAY];
+    $("qaDid").classList.toggle("isdone", did);
+    $("qaDidText").textContent = did ? "Done today" : "I did it";
+    $("didIt").textContent = did ? "✓ Done today" : "I did it";
+    $("didIt").classList.toggle("done", did);
+    $("afterDone").classList.toggle("hidden", !did);
+    if (did && document.activeElement !== $("note") && pub.last === TODAY) $("note").value = pub.note || "";
+
+    // sealed cards
+    const op = priv.open[TODAY] || {};
+    const cOpen = !!(op.c || did), pOpen = !!(op.p || priv.personal[TODAY]);
+    $("cFront").classList.toggle("hidden", cOpen); $("cBack").classList.toggle("hidden", !cOpen);
+    $("pFront").classList.toggle("hidden", pOpen); $("pBack").classList.toggle("hidden", !pOpen);
+
+    // personal
+    setAct("personalAct", personalAct());
+    const p = priv.personal[TODAY];
+    $("personalButtons").classList.toggle("hidden", !!p);
+    $("personalAfter").classList.toggle("hidden", !p);
+    if (p) {
+      $("personalMsg").textContent = p === "done" ? "Lovely. That took some courage." : "No problem. There's always tomorrow.";
+      $("journalBox").classList.toggle("hidden", p !== "done" || priv.journal.some(j => j.date === TODAY));
+    }
+
+    // monthly challenge
+    const target = 20, acts = actsThisMonth();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const left = lastDay - now.getDate();
+    $("chTitle").textContent = MONTHS[now.getMonth()] + " Kindness Challenge";
+    $("chCount").textContent = Math.min(acts, target) + " / " + target + " acts this month" + (acts >= target ? " · completed!" : "");
+    $("chLeft").textContent = left === 0 ? "Last day" : left + (left === 1 ? " day left" : " days left");
+    fillBar("chBar", "chFill", [{ at: 5, label: 5 }, { at: 10, label: 10 }, { at: 20, label: 20, pos: 100 }], Math.min(acts, target), target);
+
+    document.querySelectorAll(".feel").forEach(renderFeel);
+    $("pFeelBox").classList.toggle("hidden", priv.personal[TODAY] !== "done");
+
+    // stories
+    $("storiesTag").textContent = shared ? "Live" : "Coming soon";
+    $("storiesSub").textContent = shared ? "What people did today, in their own words." : "Stories from everyone will appear here once accounts are switched on.";
+    const box = $("stories"); box.textContent = "";
+    const withNotes = todayDocs.filter(d => d.note && d.last === TODAY).sort((a, b) => (b.at || 0) - (a.at || 0));
+    if (!withNotes.length) box.appendChild(el("div", "empty", "No stories yet today. Reveal your act, do it, and be the first to share!"));
+    withNotes.forEach(d => {
+      const s = el("div", "story"), top = el("div", "top"), w = el("div", "label");
+      w.append(el("span", "ldot"), el("span", null, d.town ? String(d.town).slice(0, 40) : "Somewhere"));
+      top.append(w, el("span", "when", ago(d.at)));
+      s.append(top, el("div", "text", String(d.note).slice(0, 140)));
+      box.appendChild(s);
+    });
+
+    // you: streak tiles + nudge
+    const best = Math.max(SI.best, st);
+    $("ktyBankText").textContent = SI.bank === 0 ? "No Be Kind To Yourself days saved" : SI.bank + " Be Kind To Yourself " + (SI.bank === 1 ? "day" : "days") + " saved";
+    const toNext = 7 - (st % 7);
+    $("ktyBankSub").textContent = SI.bank >= 2 ? "You're fully topped up." : "Earn another in " + toNext + (toNext === 1 ? " day" : " days") + ".";
+    $("curStreak").textContent = st; $("bestStreak").textContent = best;
+    $("nudgeText").textContent = did ? "Today's act is done. See you tomorrow!" : (st ? "Do today's act to make it " + (st + 1) + " days" : "Do today's act to start a new streak");
+
+    // milestones (7, 15, 50, 100 at fixed positions)
+    const ms = [7, 15, 50, 100], pos = [18, 42, 70, 100];
+    const next = ms.find(m => m > st);
+    $("mileText").textContent = next ? st + " / " + next + " days to your next milestone" : "You've passed every milestone. Amazing!";
+    let fill = 100;
+    for (let i = 0; i < ms.length; i++) {
+      if (st < ms[i]) { const p0 = i ? pos[i - 1] : 0, m0 = i ? ms[i - 1] : 0; fill = p0 + (st - m0) / (ms[i] - m0) * (pos[i] - p0); break; }
+    }
+    fillBar("mileBar", "mileFill", ms.map((m, i) => ({ at: m, label: m, pos: pos[i] })), fill, 100);
+    $("mileBar").querySelectorAll(".mile").forEach((m, i) => { m.classList.toggle("hit", st >= ms[i]); m.textContent = st >= ms[i] ? "✓" : ms[i]; });
+
+    // calendar
+    $("calTitle").textContent = MONTHS[calM] + " " + calY;
+    $("calNext").disabled = (calY === now.getFullYear() && calM === now.getMonth());
+    const cal = $("cal"); cal.textContent = "";
+    const first = new Date(Date.UTC(calY, calM, 1)), offset = (first.getUTCDay() + 6) % 7;
+    const daysIn = new Date(Date.UTC(calY, calM + 1, 0)).getUTCDate();
+    for (let i = 0; i < offset; i++) cal.appendChild(el("span"));
+    for (let dnum = 1; dnum <= daysIn; dnum++) {
+      const n = Math.floor(Date.UTC(calY, calM, dnum) / 864e5), d = dateOf(n);
+      const cell = el("div", "cd");
+      cell.append(el("span", "circ" + (pub.days[d] ? " done" : (SI.rest.has(n) ? " rest" : (n === dayNum ? " today" : ""))), String(dnum)));
+      cell.append(el("span", "pdot" + (priv.personal[d] === "done" ? " on" : "")));
+      cal.appendChild(cell);
+    }
+
+    // settings + journal
+    const names = { gentle: "Gentle", stretch: "A bit of a stretch", bold: "Bold" };
+    $("settingsLine").textContent = "Comfort level: " + (names[priv.level] || "Gentle") + " · Town: " + (priv.town || "not set") + (priv.why ? " · Your why: " + priv.why : "");
+    const jl = $("journalList"); jl.textContent = "";
+    if (!priv.journal.length) jl.appendChild(el("div", "empty", "Your journal is empty. Finish a personal act to write your first entry."));
+    priv.journal.slice().reverse().forEach(j => {
+      const d = el("div", "entry"), lab = el("div", "label d");
+      lab.append(el("span", "ldot"), el("span", null, new Date(j.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })));
+      const f = (priv.feel || {})[j.date + ":p"], fe = FEELS.find(x => x[1] === f);
+      if (fe) lab.append(el("span", null, "· " + fe[0] + " " + fe[1]));
+      d.append(lab, el("div", "a", j.act), el("div", "t", j.text));
+      jl.appendChild(d);
+    });
+  }
+
+  // ---------- Actions ----------
+  function markDone() {
+    if (pub.days[TODAY]) return;
+    pub.days[TODAY] = true; pub.last = TODAY; pub.note = ""; pub.at = 0; pub.town = priv.town || "";
+    if (!shared) todayDocs = [pub];
+    persist("pub"); render();
+  }
+  function showView(v) {
+    document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.v === v));
+    ["today", "you"].forEach(k => $("view-" + k).classList.toggle("hidden", k !== v));
+    window.scrollTo(0, 0);
+  }
+  $("didIt").onclick = markDone;
+  $("qaDid").onclick = () => { markDone(); $("cCard").scrollIntoView({ behavior: "smooth", block: "center" }); };
+  $("qaStory").onclick = () => {
+    if (!pub.days[TODAY]) { $("cCard").scrollIntoView({ behavior: "smooth", block: "center" }); if (!(priv.open[TODAY] || {}).c) reveal("c", $("cCard")); return; }
+    $("note").scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(() => $("note").focus(), 300);
+  };
+  $("qaJournal").onclick = () => { showView("you"); setTimeout(() => $("journalList").scrollIntoView({ behavior: "smooth", block: "start" }), 50); };
+  $("streakPill").onclick = () => showView("you");
+  $("saveNote").onclick = () => {
+    pub.note = $("note").value.trim().slice(0, 140); pub.at = Date.now();
+    persist("pub"); render();
+    $("saveNote").textContent = "Shared ✓"; setTimeout(() => $("saveNote").textContent = "Share story", 1500);
+  };
+  $("pDone").onclick = () => { priv.personal[TODAY] = "done"; persist("priv"); render(); };
+  $("pSkip").onclick = () => { priv.personal[TODAY] = "skip"; persist("priv"); render(); };
+  $("pSwap").onclick = () => { priv.swaps[TODAY] = (priv.swaps[TODAY] || 0) + 1; persist("priv"); render(); };
+  $("pUndo").onclick = () => { delete priv.personal[TODAY]; priv.journal = priv.journal.filter(j => j.date !== TODAY); persist("priv"); render(); };
+  $("saveJournal").onclick = () => {
+    const text = $("journal").value.trim(); if (!text) return;
+    priv.journal.push({ date: TODAY, act: personalAct().h, text: text.slice(0, 600) });
+    $("journal").value = ""; persist("priv"); render();
+  };
+  $("calPrev").onclick = () => { calM--; if (calM < 0) { calM = 11; calY--; } render(); };
+  $("calNext").onclick = () => { calM++; if (calM > 11) { calM = 0; calY++; } render(); };
+
+  function reveal(which, card) {
+    card.classList.add("flip-out");
+    setTimeout(() => {
+      priv.open[TODAY] = Object.assign({}, priv.open[TODAY], { [which]: 1 });
+      persist("priv"); render();
+      card.classList.remove("flip-out"); card.classList.add("flip-in");
+      setTimeout(() => card.classList.remove("flip-in"), 320);
+    }, 220);
+  }
+  $("cFront").onclick = () => reveal("c", $("cCard"));
+  $("pFront").onclick = () => reveal("p", $("pCard"));
+  document.querySelectorAll("nav button").forEach(b => b.onclick = () => showView(b.dataset.v));
+
+  // setup sheet
+  let chosen = null;
+  function openSetup(first) {
+    chosen = priv.level;
+    $("setupTitle").textContent = first ? "Welcome" : "Your settings";
+    $("setupIntro").classList.toggle("hidden", !first);
+    $("townInput").value = priv.town || "";
+    document.querySelectorAll(".level").forEach(l => l.classList.toggle("on", l.dataset.l === chosen));
+    $("setup").classList.add("show");
+  }
+  document.querySelectorAll(".level").forEach(l => l.onclick = () => {
+    chosen = l.dataset.l;
+    document.querySelectorAll(".level").forEach(x => x.classList.toggle("on", x === l));
+  });
+  $("setupSave").onclick = () => {
+    priv.level = chosen || "gentle";
+    priv.town = $("townInput").value.trim().slice(0, 40);
+    if (pub.days[TODAY]) pub.town = priv.town;
+    persist(); $("setup").classList.remove("show"); render();
+  };
+  $("changeLevel").onclick = () => openSetup(false);
+  $("changeTown").onclick = () => openSetup(false);
+
+  // share card
+  let shareText = "";
+  $("shareCard").onclick = () => {
+    const c = count(), cv = document.createElement("canvas"); cv.width = cv.height = 1080;
+    const g = cv.getContext("2d");
+    const grad = g.createLinearGradient(0, 0, 0, 1080); grad.addColorStop(0, "#D9F6EE"); grad.addColorStop(.55, "#FFF8F1"); grad.addColorStop(1, "#FFF8F1");
+    g.fillStyle = grad; g.fillRect(0, 0, 1080, 1080);
+    g.fillStyle = "#386C1C"; g.font = "700 64px 'Space Grotesk', sans-serif"; g.fillText("RAOK", 90, 160);
+    g.fillStyle = "#2B2A33"; g.font = "700 100px 'Space Grotesk', sans-serif";
+    g.fillText("Today I was", 90, 330);
+    g.fillStyle = "#0C8079"; g.fillText("1 of " + c.toLocaleString("en-GB"), 90, 440);
+    g.fillStyle = "#2B2A33"; g.fillText(c === 1 ? "person who" : "people who", 90, 550);
+    g.fillText("chose kindness.", 90, 660);
+    g.font = "500 40px Inter, sans-serif"; g.fillStyle = "#4F4B57";
+    const words = communityAct.h.split(" "); let line = "", y = 790;
+    for (const w of words) { const t = line ? line + " " + w : w; if (g.measureText(t).width > 900) { g.fillText(line, 90, y); y += 54; line = w; } else line = t; }
+    g.fillText(line, 90, y);
+    g.font = "700 38px 'Space Grotesk', sans-serif"; g.fillStyle = "#386C1C"; g.fillText("Join in: raokapp.com", 90, 1000);
+    $("cardImg").src = cv.toDataURL("image/png");
+    shareText = "Today I was 1 of " + c + " " + (c === 1 ? "person" : "people") + " who chose kindness: " + communityAct.h + " #RandomActsOfKindness raokapp.com";
+    $("cardSheet").classList.add("show");
+  };
+  $("closeCard").onclick = () => $("cardSheet").classList.remove("show");
+  $("copyText").onclick = async () => {
+    try { await navigator.clipboard.writeText(shareText); $("copyText").textContent = "Copied ✓"; }
+    catch (e) { $("copyText").textContent = "Couldn't copy"; }
+    setTimeout(() => $("copyText").textContent = "Copy text", 1500);
+  };
+
+  // ---------- Start ----------
+  loadLocal();
+  if (pub.days[TODAY]) todayDocs = [pub];
+  render();
+  if (!priv.seed) { priv.seed = Math.random().toString(36).slice(2); saveLocal(); }
+  const INTRO = [
+    { ic: "R", t: "Welcome to RAOK", s: "One small act of kindness. Every day. Together." },
+    { ic: "?", t: "Two acts a day", s: "Every morning everyone gets the same easy act, plus a sealed one just for you. Tap the cards to reveal them." },
+    { ic: "✓", t: "Do it, tick it off", s: "Watch the community count grow, keep your streak going, and save how it felt in your private journal." },
+    { why: true, t: "Why do you want to be kinder?", s: "Pick the one that fits best. We'll remind you of it." }
+  ];
+  const WHYS = ["Feel happier", "Connect with people", "Make my community nicer", "Set an example for my kids", "Just curious"];
+  let step = 0;
+  function showIntro() {
+    const it = INTRO[step], body = $("introBody"); body.textContent = "";
+    if (!it.why) { const ic = el("div", "big-ic", it.ic); body.append(ic); }
+    body.append(el("h3", null, it.t), el("p", "sub", it.s));
+    if (it.why) {
+      const w = el("div", "why");
+      WHYS.forEach(x => { const b = el("button", priv.why === x ? "on" : "", x); b.type = "button"; b.onclick = () => { priv.why = x; saveLocal(); showIntro(); }; w.append(b); });
+      body.append(w);
+    }
+    $("introDots").textContent = ""; INTRO.forEach((_, i) => $("introDots").append(el("i", i === step ? "on" : "")));
+    $("introNext").textContent = step === INTRO.length - 1 ? "Continue" : "Next";
+    $("introNext").disabled = !!it.why && !priv.why;
+    $("introNext").style.opacity = $("introNext").disabled ? .5 : 1;
+    $("intro").classList.add("show");
+  }
+  $("introNext").onclick = () => {
+    if (step < INTRO.length - 1) { step++; showIntro(); return; }
+    $("intro").classList.remove("show"); openSetup(true);
+  };
+  if (!priv.level) showIntro();
+  $("resetApp").onclick = () => {
+    if (!confirm("Start again from scratch? This clears your streak, journal and settings on this phone.")) return;
+    try { localStorage.removeItem(LS); } catch (e) {}
+    location.reload();
+  };
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // Accounts and the shared community count plug in here later (Supabase).
+})();
+</script>
+</body>
+</html>
