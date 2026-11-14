@@ -726,7 +726,8 @@
     const cWrapped = did && ((priv.storyDone || {})[TODAY] || (pub.last === TODAY && !!pub.note)) && !storyEditing;
     if (cWrapped && !p) acts.insertBefore($("pCard"), $("cCard")); else acts.insertBefore($("cCard"), $("pCard"));
     // when everything's done, the mural is the next thing to look at
-    if (all) $("doneCard").after($("muralCard")); else $("chCard").after($("muralCard"));
+    $("doneCard").after($("acts"));
+    if (all) $("acts").after($("muralCard")); else $("chCard").after($("muralCard"));
     if (all) {
       $("dlC").textContent = communityAct.h;
       const pa = personalAct();
@@ -1074,7 +1075,7 @@
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
   // done-for-today
-  $("toggleActs").onclick = () => { showActs = !showActs; render(); };
+  $("toggleActs").onclick = () => { showActs = !showActs; render(); if (showActs) setTimeout(() => $("acts").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }), 50); };
   $("doneMural").onclick = () => $("muralCard").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" });
   setInterval(() => { if (!$("doneCard").classList.contains("hidden")) $("tmrw").textContent = untilTomorrow(); }, 30000);
   // new day while the app was left open: start fresh
