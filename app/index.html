@@ -164,6 +164,15 @@
   .act .hl{display:block;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;line-height:1.2}
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
+  .feel.picked{display:block}
+  .feel .felt .tlink{all:unset;cursor:pointer;color:var(--teal-dark);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;padding:6px 2px}
+  .felt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--cream);border:1px solid var(--line);font-size:15px;font-weight:600;color:var(--ink)}
+  .felt .e{font-size:22px;line-height:1}
+  .felt .grow{flex:1}
+  .tlink{background:none;border:0;padding:6px 2px;min-height:32px;color:var(--teal-dark);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  .mystory{padding:12px 14px;border-radius:12px;background:var(--cream);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+  .mystory .t{font-size:15px;line-height:1.45;color:var(--ink)}
+  .mystory .row3{display:flex;justify-content:space-between;align-items:center}
   .feel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
   .feel button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border-radius:12px;border:1px solid var(--line2);background:#fff;font-size:10px;font-weight:600;color:var(--soft);min-height:64px;letter-spacing:-.2px}
   .feel button span{font-size:24px;line-height:1}
@@ -232,12 +241,19 @@
         <div id="afterDone" class="stack hidden">
           <p class="proof">Research shows the person you helped probably felt even better than you think.</p>
           <div><p class="flabel">How did it feel? Only you see this.</p><div class="feel" data-feel="c"></div></div>
-          <label><p class="flabel">Share what happened (optional, others will see it)</p>
-          <textarea id="note" rows="2" maxlength="140" placeholder="e.g. Told the bus driver they made my morning"></textarea></label>
-          <div class="row">
-            <button class="pill" id="saveNote">Share story</button>
-            <button class="pill primary" id="shareCard">Make share card</button>
+          <div id="storyEdit" class="stack">
+            <label><p class="flabel">Share what happened (optional, others will see it)</p>
+            <textarea id="note" rows="2" maxlength="140" placeholder="e.g. Told the bus driver they made my morning"></textarea></label>
+            <div class="row">
+              <button class="pill" id="skipNote">Not today</button>
+              <button class="pill primary" id="saveNote">Share story</button>
+            </div>
           </div>
+          <div id="storyDone" class="mystory hidden">
+            <span class="row3"><span class="flabel" id="storyDoneLabel" style="margin:0">Your story</span><button class="tlink" id="editNote" type="button">Edit</button></span>
+            <span class="t" id="storyDoneText"></span>
+          </div>
+          <button class="pill primary hidden" id="shareCard">Make share card</button>
         </div>
       </div>
     </div>
@@ -380,7 +396,7 @@
 
   // ---------- State ----------
   const LS = "raok_v1";
-  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "" });
+  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {} });
   const blankPub = () => ({ last: "", note: "", town: "", days: {}, at: 0 });
   let priv = blankPriv(), pub = blankPub();
   let todayDocs = [];
@@ -464,14 +480,25 @@
     const box = $(id); box.textContent = "";
     box.append(el("span", "hl", a.h), el("span", "pl", a.l));
   }
+  const feelEditing = {}; let storyEditing = false;
   const FEELS = [["😍", "Wonderful"], ["😊", "Happy"], ["🙂", "Good"], ["😐", "Okay"], ["😬", "Awkward"]];
   function renderFeel(box) {
     const key = TODAY + ":" + box.dataset.feel, cur = (priv.feel || {})[key];
     box.textContent = "";
+    const editing = feelEditing[box.dataset.feel];
+    box.classList.toggle("picked", !!cur && !editing);
+    if (cur && !editing) {
+      const f = FEELS.find(x => x[1] === cur) || ["", cur];
+      const row = el("div", "felt");
+      row.append(el("span", "e", f[0]), el("span", "grow", "You felt " + cur.toLowerCase()));
+      const ch = el("button", "tlink", "Change"); ch.type = "button";
+      ch.onclick = () => { feelEditing[box.dataset.feel] = true; render(); };
+      row.appendChild(ch); box.appendChild(row); return;
+    }
     FEELS.forEach(([e, name]) => {
       const b = el("button", cur === name ? "on" : ""); b.type = "button";
       b.append(el("span", null, e), document.createTextNode(name));
-      b.onclick = () => { priv.feel = priv.feel || {}; priv.feel[key] = name; persist("priv"); render(); };
+      b.onclick = () => { priv.feel = priv.feel || {}; priv.feel[key] = name; feelEditing[box.dataset.feel] = false; persist("priv"); render(); };
       box.appendChild(b);
     });
   }
@@ -517,6 +544,19 @@
     $("didIt").textContent = did ? "✓ Done today" : "I did it";
     $("didIt").classList.toggle("done", did);
     $("afterDone").classList.toggle("hidden", !did);
+    const storyWrapped = did && (priv.storyDone || {})[TODAY] && !storyEditing;
+    const hasFeel = !!(priv.feel || {})[TODAY + ":c"];
+    $("storyEdit").classList.toggle("hidden", !hasFeel || storyWrapped);
+    $("storyDone").classList.toggle("hidden", !storyWrapped);
+    $("shareCard").classList.toggle("hidden", !storyWrapped);
+    $("skipNote").textContent = storyEditing ? "Cancel" : "Not today";
+    if (storyWrapped) {
+      const n = pub.last === TODAY ? (pub.note || "") : "";
+      $("storyDoneLabel").textContent = n ? "Your story" : "No story today";
+      $("storyDoneText").textContent = n ? "“" + n + "”" : "You can still add one if you like.";
+      $("storyDoneText").classList.toggle("hidden", false);
+      $("editNote").textContent = n ? "Edit" : "Add a story";
+    }
     if (did && document.activeElement !== $("note") && pub.last === TODAY) $("note").value = pub.note || "";
 
     // sealed cards
@@ -626,15 +666,19 @@
   $("qaDid").onclick = () => { markDone(); $("cCard").scrollIntoView({ behavior: "smooth", block: "center" }); };
   $("qaStory").onclick = () => {
     if (!pub.days[TODAY]) { $("cCard").scrollIntoView({ behavior: "smooth", block: "center" }); if (!(priv.open[TODAY] || {}).c) reveal("c", $("cCard")); return; }
-    $("note").scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(() => $("note").focus(), 300);
+    storyEditing = true; if (!(priv.feel || {})[TODAY + ":c"]) { $("afterDone").scrollIntoView({ behavior: "smooth", block: "center" }); render(); return; }
+    render(); $("note").scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(() => $("note").focus(), 300);
   };
   $("qaJournal").onclick = () => { showView("you"); setTimeout(() => $("journalList").scrollIntoView({ behavior: "smooth", block: "start" }), 50); };
   $("streakPill").onclick = () => showView("you");
+  const wrapStory = () => { priv.storyDone = priv.storyDone || {}; priv.storyDone[TODAY] = true; storyEditing = false; persist(); render(); };
   $("saveNote").onclick = () => {
-    pub.note = $("note").value.trim().slice(0, 140); pub.at = Date.now();
-    persist("pub"); render();
-    $("saveNote").textContent = "Shared ✓"; setTimeout(() => $("saveNote").textContent = "Share story", 1500);
+    const n = $("note").value.trim().slice(0, 140);
+    if (!n && !storyEditing) { $("note").focus(); return; }
+    pub.note = n; pub.at = Date.now(); wrapStory();
   };
+  $("skipNote").onclick = () => { if (!storyEditing) { pub.note = ""; } wrapStory(); };
+  $("editNote").onclick = () => { storyEditing = true; render(); setTimeout(() => $("note").focus(), 50); };
   $("pDone").onclick = () => { priv.personal[TODAY] = "done"; persist("priv"); render(); };
   $("pSkip").onclick = () => { priv.personal[TODAY] = "skip"; persist("priv"); render(); };
   $("pSwap").onclick = () => { priv.swaps[TODAY] = (priv.swaps[TODAY] || 0) + 1; persist("priv"); render(); };
