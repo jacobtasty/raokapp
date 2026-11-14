@@ -60,6 +60,7 @@
   .ringwrap{position:relative;width:200px;height:200px}
   .ringwrap .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
   .ringwrap .in .s{font-size:13px;color:var(--muted)}
+  .ringwrap .in .goalpill{margin-top:6px;font-size:12px;font-weight:600;color:var(--teal-dark);background:var(--teal-tint);border-radius:999px;padding:4px 10px}
   .ringwrap .in b{font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:700;letter-spacing:-1px;line-height:1}
   #ringArc{transition:stroke-dasharray .6s ease}
   .hubline{font-size:15px;color:var(--soft);text-align:center;line-height:1.4;margin:0}
@@ -254,7 +255,7 @@
       <div class="label" style="align-self:flex-start"><span class="ldot live"></span><span id="liveLabel">Live today · community goal</span></div>
       <div class="ringwrap">
         <svg aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#E3EFEE" stroke-width="14"/><circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="#2BB8AE" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 540" transform="rotate(-90 100 100)"/></svg>
-        <div class="in"><span class="s">Acts today</span><b id="count" aria-live="polite">0</b><span class="s" id="goalLine">/ 10</span></div>
+        <div class="in"><b id="count" aria-live="polite">0</b><span class="s" id="peopleWord">people today</span><span class="goalpill" id="goalLine">Community goal: 10</span></div>
       </div>
       <p class="hubline" id="hubline"></p>
       <button class="streakpill" id="streakPill">
@@ -792,11 +793,12 @@
     // ring
     const c = count(), goal = goalFor(c);
     $("count").textContent = c.toLocaleString("en-GB");
-    $("goalLine").textContent = "/ " + goal.toLocaleString("en-GB");
+    $("goalLine").textContent = "Community goal: " + goal.toLocaleString("en-GB");
+    $("peopleWord").textContent = (c === 1 ? "person" : "people") + " today";
     $("ringArc").setAttribute("stroke-dasharray", (540 * Math.min(1, c / goal)).toFixed(1) + " 540");
     $("ringArc").style.opacity = c ? 1 : 0;
     const towns = new Set(todayDocs.map(d => d.town).filter(Boolean));
-    $("liveLabel").textContent = shared ? "Live today · community goal" : "Preview · community goal";
+    $("liveLabel").textContent = shared ? "Live · the whole community today" : "Preview · the whole community today";
     $("hubline").textContent = !shared ? (c ? "That's you counted! The whole community's count goes live once accounts are switched on." : "Do today's act to get counted. The whole community's count goes live once accounts are switched on.") : c === 0 ? "Nobody has ticked off today's act yet. Be the first!" :
       (c === 1 ? "1 person has" : c.toLocaleString("en-GB") + " people have") + " been kind today" + (towns.size >= 2 ? ", across " + towns.size + " towns" : "") + ". Let's reach " + goal.toLocaleString("en-GB") + ".";
     const st = SI.streak;
