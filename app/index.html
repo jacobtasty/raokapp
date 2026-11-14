@@ -166,6 +166,22 @@
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
   .feel.picked{display:block}
+  .quick{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .ideasbtn{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:none;border:0;padding:4px 0;color:var(--teal-dark);font-size:14px;font-weight:600}
+  .personal .ideasbtn{color:var(--lilac)}
+  .ideas{margin:6px 0 0;padding:10px 12px 10px 30px;border-radius:12px;background:var(--cream);border:1px solid var(--line);font-size:14px;line-height:1.45;color:var(--soft)}
+  .ideas li+li{margin-top:6px}
+  .recap{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#FCE3E8;border:1px solid #F6C9D3;font-size:14px;color:#7A2338}
+  .recap .grow{flex:1;font-weight:600}
+  .recap .x{background:none;border:0;font-size:20px;line-height:1;color:#7A2338;padding:4px 6px}
+  .mstone{text-align:center}
+  .mstone .num{font-family:'Space Grotesk',sans-serif;font-size:76px;font-weight:700;line-height:1;color:var(--teal-dark);margin:6px 0 2px}
+  .mstone .unlock{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid var(--line);margin:14px 0}
+  .styles{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0 16px}
+  .styles button{display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:1px solid var(--line2);border-radius:12px;padding:8px 2px;font-size:11px;font-weight:600;color:var(--soft)}
+  .styles button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  .styles button[disabled]{opacity:.55}
+  .styles .lock{font-size:10px;font-weight:600;color:var(--muted)}
   .donecard{background:linear-gradient(160deg,#EEF9E7 0%,#FFFFFF 70%);border-color:var(--green-line)}
   .donehead{display:flex;gap:14px;align-items:center}
   .donehead .em{width:52px;height:52px;border-radius:50%;background:#fff;border:1px solid var(--green-line);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
@@ -249,6 +265,7 @@
   <!-- COMMUNITY HUB -->
   <section id="view-today" class="stack">
     <div class="week" id="week"></div>
+    <div class="recap hidden" id="recap" role="status"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><use href="#hand" fill="#E8607A"/></svg><span class="grow" id="recapText"></span><button class="tlink" id="recapSee" type="button" style="color:#7A2338">See them</button><button class="x" id="recapX" type="button" aria-label="Dismiss">×</button></div>
     <div class="kty hidden" id="ktyBanner"><span class="ic"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-9 6-15 15-16-1 9-7 15-15 16z"/><path d="M5 20l9-9"/></svg></span><span id="ktyBannerText"></span></div>
 
     <div class="card ringcard">
@@ -269,7 +286,6 @@
       <button class="qa main" id="qaDid"><span class="c"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span id="qaDidText">I did it</span></button>
       <button class="qa" id="qaStory"><span class="c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><span>Share story</span></button>
       <button class="qa j" id="qaJournal"><span class="c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><span>Journal</span></button>
-      <button class="qa soon" aria-disabled="true" title="Coming soon"><span class="c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span>Chains · soon</span></button>
     </div>
 
     <div class="card donecard hidden" id="doneCard" aria-live="polite">
@@ -359,7 +375,7 @@
       <p class="small" id="muralSub">Every community act adds a handprint. Fill the mural together to reveal the hidden picture.</p>
       <div class="row">
         <button class="pill" id="findMine" type="button">Find my handprints</button>
-        <button class="pill" id="pickColour" type="button">My colour</button>
+        <button class="pill" id="pickColour" type="button">My handprint</button>
       </div>
     </div>
 
@@ -445,13 +461,27 @@
     <rect x="15.9" y="5.2" width="2.5" height="8.6" rx="1.25"/>
     <rect x="1.6" y="11.2" width="2.7" height="8" rx="1.35" transform="rotate(-38 3 15.2)"/>
   </symbol>
+  <pattern id="pStripes" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><rect width="1.3" height="3" fill="#fff" fill-opacity=".55"/></pattern>
+  <pattern id="pDots" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.6" r=".75" fill="#fff" fill-opacity=".7"/></pattern>
+  <symbol id="spark" viewBox="0 0 10 10"><path d="M5 0l1.2 3.8L10 5 6.2 6.2 5 10 3.8 6.2 0 5l3.8-1.2z"/></symbol>
 </defs></svg>
 
+<div class="overlay" id="mileSheet"><div class="sheet mstone" role="dialog" aria-labelledby="mileTitle">
+  <div class="num" id="mileNum">7</div>
+  <h3 id="mileTitle">acts of kindness!</h3>
+  <p class="sub" id="mileSub"></p>
+  <div class="unlock hidden" id="mileUnlock"><svg width="48" height="48" viewBox="0 0 24 24" id="mileHand" aria-hidden="true"></svg><span><b id="mileStyleName"></b><br><span class="small">New handprint style unlocked</span></span></div>
+  <div class="row"><button class="pill" id="mileShare" type="button">Share</button><button class="pill primary" id="mileTry" type="button">Try my new style</button></div>
+  <button class="link" id="mileClose" type="button" style="align-self:center;margin:14px auto 0;display:block">Close</button>
+</div></div>
+
 <div class="overlay" id="colourSheet"><div class="sheet">
-  <h3>Your handprint colour</h3>
+  <h3>Your handprint</h3>
   <p class="sub">Every time you do the daily act, a handprint in this colour goes on the community mural. Pick a skin tone or any colour you like.</p>
   <div id="swatches"></div>
-  <button class="big" id="saveColour">Save my colour</button>
+  <p class="flabel">Style</p>
+  <div class="styles" id="styles"></div>
+  <button class="big" id="saveColour">Save my handprint</button>
 </div></div>
 
 <div class="overlay" id="cardSheet"><div class="sheet">
@@ -491,12 +521,12 @@
 
   // ---------- State ----------
   const LS = "raok_v1";
-  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {}, colour: "", textSize: "auto" });
+  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {}, colour: "", textSize: "auto", style: "classic", miles: [], muralSeen: null });
   const blankPub = () => ({ last: "", note: "", town: "", days: {}, at: 0 });
   let priv = blankPriv(), pub = blankPub();
   let todayDocs = [];
   let shared = false;
-  let todayTotal = 0, me = null, sbOk = false, pushPending = false;
+  let todayTotal = 0, me = null, sbOk = false, pushPending = false, noStyleCol = false, recapPop = null, recapChecked = false;
   let mural = { rows: [], total: 0 }, findMine = false, pickedColour = null;
   let calY = now.getFullYear(), calM = now.getMonth();
 
@@ -554,11 +584,11 @@
       const s = await ensureSession();
       await sb("acts_done?on_conflict=user_id,day", {
         method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-        body: { user_id: s.user_id, day: TODAY, note: pub.last === TODAY && pub.note ? pub.note : null, town: priv.town || null, colour: myColour() }
-      });
+        body: Object.assign({ user_id: s.user_id, day: TODAY, note: pub.last === TODAY && pub.note ? pub.note : null, town: priv.town || null, colour: myColour() }, noStyleCol ? {} : { style: myStyle() })
+      }).catch(e => { if (!noStyleCol && /rest 400/.test(e.message)) { noStyleCol = true; throw Object.assign(new Error("retry"), { retry: true }); } throw e; });
       pushPending = false;
       await refresh();
-    } catch (e) { console.warn("RAOK sync", e); }
+    } catch (e) { if (e.retry) return pushToday(); console.warn("RAOK sync", e); }
   }
   let refreshing = null;
   function refresh() { return refreshing || (refreshing = doRefresh().finally(() => { refreshing = null; })); }
@@ -571,11 +601,15 @@
       todayDocs = rows.map(x => ({ uid: x.user_id, town: x.town, note: x.note, last: TODAY, at: Date.parse(x.created_at) }));
       const m = monthKey(now.getFullYear(), now.getMonth()), goal = muralGoal();
       const end = monthKey(now.getFullYear(), now.getMonth()) + "-" + String(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).padStart(2, "0");
-      const r2 = await sb("acts_done?day=gte." + m + "-01&day=lte." + end + "&select=user_id,colour&order=created_at.asc&limit=" + goal, { headers: { Prefer: "count=exact" } });
+      const q2 = cols => "acts_done?day=gte." + m + "-01&day=lte." + end + "&select=" + cols + "&order=created_at.asc&limit=" + goal;
+      let r2;
+      try { r2 = await sb(q2(noStyleCol ? "user_id,colour" : "user_id,colour,style"), { headers: { Prefer: "count=exact" } }); }
+      catch (e) { if (noStyleCol || !/rest 400/.test(e.message)) throw e; noStyleCol = true; r2 = await sb(q2("user_id,colour"), { headers: { Prefer: "count=exact" } }); }
       const mrows = await r2.json();
       mural = { rows: mrows, total: totalOf(r2, mrows.length) };
       if (!sbOk && pub.days[TODAY] && !rows.some(x => x.user_id === me)) { sbOk = true; shared = true; return pushToday(); } // tick from before accounts
       sbOk = true; shared = true; notice("");
+      checkRecap();
     } catch (e) {
       console.warn("RAOK refresh", e);
       if (!sbOk) shared = false;
@@ -592,6 +626,19 @@
   // ---------- Mural ----------
   const COLOURS = [["Coral", "#E8607A"], ["Sunshine", "#F2B33D"], ["Leaf", "#4E9A2A"], ["Teal", "#0C8079"], ["Sky", "#4A90D9"], ["Lilac", "#6B5BD6"], ["Orange", "#F28C28"], ["Berry", "#B8407A"]];
   const SKINS = [["Light", "#F3CFAE"], ["Medium light", "#DDB08A"], ["Medium", "#BF8A5F"], ["Medium dark", "#946140"], ["Dark", "#6B4329"], ["Deep", "#462A1B"]];
+  const STYLES = [["classic", "Classic", 0], ["sparkle", "Sparkle", 7], ["stripes", "Stripes", 15], ["dots", "Polka dots", 50], ["gold", "Gold edge", 100]];
+  const totalActs = () => Object.keys(pub.days).length + Object.values(priv.personal).filter(v => v === "done").length;
+  const styleOk = st => { const f = STYLES.find(x => x[0] === st); return f && totalActs() >= f[2]; };
+  const myStyle = () => styleOk(priv.style) ? priv.style : "classic";
+  // draws a handprint with its style into an svg group/element
+  function drawHand(parent, x, y, size, colour, style, opacity) {
+    const NS = "http://www.w3.org/2000/svg", mk = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); parent.appendChild(e); return e; };
+    const u = mk("use", { href: "#hand", x, y, width: size, height: size, fill: colour, opacity });
+    if (style === "gold") { u.setAttribute("stroke", "#E0A526"); u.setAttribute("stroke-width", "1.6"); }
+    if (style === "stripes" || style === "dots") mk("use", { href: "#hand", x, y, width: size, height: size, fill: style === "stripes" ? "url(#pStripes)" : "url(#pDots)", opacity });
+    if (style === "sparkle") { const k = size / 24; mk("use", { href: "#spark", x: x + 17 * k, y: y - 1 * k, width: 7 * k, height: 7 * k, fill: "#F2B33D", opacity }); mk("use", { href: "#spark", x: x + 1 * k, y: y + 3 * k, width: 4.5 * k, height: 4.5 * k, fill: "#F2B33D", opacity }); }
+    return u;
+  }
   const MURAL_GOALS = { "2026-11": 100 };  // per-month targets; raise as the community grows
   const muralGoal = () => MURAL_GOALS[monthKey(now.getFullYear(), now.getMonth())] || 500;
   const colourFor = id => COLOURS[hash(String(id || "x")) % COLOURS.length][1];
@@ -622,17 +669,18 @@
     cells.forEach((c, i) => {
       const r = rows[i];
       if (!r) { const d = document.createElementNS(NS, "circle"); d.setAttribute("cx", c.cx); d.setAttribute("cy", c.cy); d.setAttribute("r", Math.max(1.5, size * .06)); d.setAttribute("fill", "#E9DED3"); svg.appendChild(d); return; }
-      const u = document.createElementNS(NS, "use"), hs = size * .92, rot = (hash(i + ":" + r.user_id) % 50) - 25;
-      u.setAttribute("href", "#hand"); u.setAttribute("width", hs); u.setAttribute("height", hs);
-      u.setAttribute("x", c.cx - hs / 2); u.setAttribute("y", c.cy - hs / 2);
-      u.setAttribute("transform", "rotate(" + rot + " " + c.cx + " " + c.cy + ")");
-      u.setAttribute("fill", /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id));
-      const g = document.createElementNS(NS, "g"); if (i === popIndex && mine(r)) g.setAttribute("class", "pop");
+      const hs = size * .92, rot = (hash(i + ":" + r.user_id) % 50) - 25;
+      const g = document.createElementNS(NS, "g");
+      const popping = (i === popIndex && mine(r)) || (recapPop && i >= recapPop[0] && i < recapPop[1]);
+      if (popping) { g.setAttribute("class", "pop"); if (recapPop && !(i === popIndex)) g.style.animationDelay = ((i - recapPop[0]) * 90) + "ms"; }
+      const gr = document.createElementNS(NS, "g"); gr.setAttribute("transform", "rotate(" + rot + " " + c.cx + " " + c.cy + ")"); g.appendChild(gr);
       let op = done || c.inside ? 1 : .3;
       if (findMine) op = mine(r) ? 1 : .08;
-      u.setAttribute("opacity", op);
+      const col = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
+      const st = mine(r) && !shared ? myStyle() : (r.style || "classic");
+      const u = drawHand(gr, c.cx - hs / 2, c.cy - hs / 2, hs, col, st, op);
       if (findMine && mine(r)) { u.setAttribute("stroke", "#2B2A33"); u.setAttribute("stroke-width", "1.2"); }
-      g.appendChild(u); svg.appendChild(g);
+      svg.appendChild(g);
     });
     svg.setAttribute("aria-label", "Community mural: " + Math.min(total, goal) + " of " + goal + " handprints" + (rows.filter(mine).length ? ", " + rows.filter(mine).length + " of them yours" : ""));
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(), left = lastDay - now.getDate();
@@ -704,9 +752,19 @@
     });
   }
 
+  const IDEAS = {"C01": ["At the shop, station or office door, glance back before you let go.", "Make eye contact and smile, even if they're busy.", "Got your hands free? Hold it for the buggy or wheelchair coming through."], "C02": ["Keep it specific: \"That's a brilliant scarf\" beats \"nice outfit\".", "Pick something they chose, like a coat, a bag or a dog, not their body.", "Say it as you pass and keep walking, so there's no pressure."], "C03": ["At the till, wave the person with one or two items ahead.", "Let someone in first at the coffee queue or the bus stop.", "In traffic, let the car waiting at the junction out."], "C04": ["Thank the bus driver as you get off.", "Read the name badge and use it: \"Thanks, Sam.\"", "Tell the courier you appreciate them braving the weather."], "C05": ["Think of your favourite café, barber or corner shop.", "Mention one thing by name, like the person who served you or a dish you loved.", "Google, Facebook or Tripadvisor all count. Five stars and two kind lines is plenty."], "C06": ["A simple text works: \"I'm really glad you're in my life.\"", "Tell them one specific thing they did that you still remember.", "No reason needed. That's what makes it land."], "C07": ["Pick up one wrapper or can on your way somewhere.", "Use a bag or glove if you'd rather not touch it.", "Pop it in the next bin, or the recycling if you can."], "C08": ["Look for the box at the supermarket till or the pharmacy counter.", "Contactless boxes count too.", "Even 20p adds up when everyone does it today."], "C09": ["Ask a colleague or family member how they take it, then just make it.", "Bring it over without a fuss.", "No kettle nearby? Pick up a coffee for someone on your way."], "C10": ["Scroll back through your messages to someone you've lost touch with.", "\"Thought of you today, how are you?\" is enough.", "Mention a memory you share to get the chat going."], "C11": ["Put your phone face down or in your pocket.", "Ask a follow-up question about what they just said.", "Let them finish before you jump in with your own story."], "C12": ["Tell them in person, or send a quick message.", "Be specific: \"The way you handled that call was brilliant.\"", "Copy in their manager if it feels right."], "C13": ["Tape a thank-you note to your bin lid or letterbox.", "Say thanks when you see them on your street.", "A wave and a smile from the window counts too."], "C14": ["Post a photo of something you bought or ate there.", "Tag them so they see it.", "Add one line about why you love them."], "C15": ["Look out for heavy shopping bags, a buggy on steps or a suitcase on stairs.", "Ask first: \"Would a hand help?\"", "If they say no thanks, smile and that's still kind."], "C16": ["Say it properly, with their name if you know it.", "Add one more line: \"Lovely morning, isn't it?\"", "Don't know their name? Today's a good day to ask."], "C17": ["Look around the car park for stray trolleys.", "Wheel one back to the trolley bay on your way in or out.", "If there's a coin in it, leave it for the next person."], "C18": ["Find the food bank box near the supermarket exit.", "Tins, pasta, rice, tea and toiletries are always needed.", "No box nearby? Many food banks take donations online."], "C19": ["Think back over the last month. Who went out of their way for you?", "Send a message saying what they did and how it helped.", "A handwritten card means even more."], "C20": ["At a busy junction, slow down and flash to let them out.", "In a queue of traffic, leave a gap at the side road.", "Only when it's safe for everyone."], "C21": ["When they say \"fine\", try \"No, really, how are you?\"", "Then stay quiet and give them time.", "You don't need to fix anything, just listen."], "C22": ["Hear someone hurrying? Press the open button.", "Ask which floor they need and press it for them.", "A smile while you wait makes it even better."], "C23": ["Think of a book, song, podcast or film you loved lately.", "Send it to someone who'd love it too.", "Say why: \"This made me think of you because...\""], "C24": ["Pick someone you live with, or someone in your family.", "Tell them one thing you admire about them.", "Say it at a normal moment, like breakfast or the school run."], "C25": ["Leave a finished book on a bench, at a bus stop or in a little library.", "Write a short note inside: \"Free to a good home, enjoy!\"", "Charity shops and community fridges often take books too."], "C26": ["Wash up the mugs in the office kitchen.", "Wipe the table, or straighten the shoes in the hallway.", "Pick up any litter around your favourite bench."], "C27": ["Every till, counter and checkout today.", "Look up from your phone when you say it.", "Add their name if they're wearing a badge."], "C28": ["Record 30 seconds just saying hi.", "Tell them something that made you think of them.", "Voice notes feel warmer than texts, especially for older relatives."], "C29": ["Think of a neighbour, relative or friend who lives alone.", "Knock, call, or drop a note through the door.", "Offer something specific: \"I'm going to the shop, need anything?\""], "C30": ["Catch their eye and smile, so they know you're not judging.", "Say \"You're doing great, we've all been there.\"", "Offer to help with bags or the door if they look stuck."], "C31": ["Find a post that made you smile today.", "Tell the person what you liked about it.", "Small creators and friends with few likes will appreciate it most."], "C32": ["Think of a teacher, nurse, carer or GP who helped you or your family.", "Send a message, card or email to them or their workplace.", "Say what they did and the difference it made."], "C33": ["Bring biscuits, fruit or a homemade cake to share.", "Leave it in the staff room or by the kettle with a note.", "Check for allergies if you can."], "C34": ["On the bus or train, look for someone who needs it more.", "Older people, pregnant people and parents with little ones.", "Offer quietly: \"Would you like to sit down?\""], "C35": ["Take your own bag, cup or bottle today.", "Say no to a straw or plastic cutlery.", "Pick the loose fruit instead of the packaged one."], "C36": ["Water a tree or planter on your street.", "Plant some seeds in a pot by your door.", "Share cuttings or seeds with a neighbour."], "C37": ["Ask a busy colleague: \"Anything I can take off your plate?\"", "Offer to cover a small task or a quick errand.", "Share a shortcut that saves them time."], "C38": ["Round up your bill or add a little extra.", "Tip the delivery driver or the person who made your coffee.", "Tell them it's because they did a great job."], "C39": ["Find a photo of you and someone you love.", "Send it with \"Remember this?\"", "Say what you love about that memory."], "C40": ["Ask a barista, receptionist or neighbour their name.", "Use it next time you see them.", "If you've forgotten someone's name, it's OK to ask again."], "C41": ["Tell someone's manager, partner or friend how great they are.", "Be specific about what they did.", "It often gets back to them, and that makes it even better."], "C42": ["Find clothes, books or toys you no longer use.", "Drop them at a charity shop or donation bank.", "Or offer them free on a local group."], "C43": ["Reply to someone who helped you online, like a forum answer or a useful video.", "Leave a thank-you comment.", "Share it so it helps others too."], "C44": ["Look out for someone checking a map or looking around.", "Ask \"Are you looking for somewhere?\"", "Walk them part of the way if you have time."], "C45": ["Make a cuppa or a simple meal for someone busy.", "Drop leftovers round to a friend who's had a tough week.", "Ask what they fancy, or surprise them."], "C46": ["In the car park, leave the closest space for someone else.", "On the bus, let others on first.", "At an event, offer the better seat."], "C47": ["Set a timer for five minutes.", "Pick up litter on your street or in your local park.", "Wear gloves and bring a bag."], "C48": ["See a group trying to take a selfie? Offer to take it.", "Take a few so they can choose the best one.", "Get everyone in, including the photographer."], "C49": ["Find the message you've been meaning to answer.", "A short reply is better than none.", "Say sorry it took a while, if you like."], "C50": ["In a meeting or group chat, name who did the work.", "\"That was Priya's idea\" goes a long way.", "Do it in front of others."], "C51": ["Leave a sticky note on a mirror, a desk or a lunchbox.", "Write something simple: \"You've got this!\"", "Leave one somewhere public for a stranger to find."], "C52": ["Tell a shop worker exactly how they helped you.", "Ask for their name and tell their manager too.", "Fill in the feedback card or survey and mention them."], "C53": ["Make a bit extra of whatever you're cooking tonight.", "Pop a portion round to a neighbour.", "Use a container they don't need to return."], "C54": ["When someone's slow or stuck, take a breath and wait.", "Let them finish without hurrying them.", "A kind \"No rush\" helps."], "C55": ["Spot someone standing or sitting alone.", "Invite them to join your group or conversation.", "Ask them a question about themselves."], "C56": ["Show someone a shortcut on their phone or computer.", "Teach a quick recipe or a skill you're good at.", "Answer a question in a local group."], "C57": ["Turn off lights and plugs you're not using.", "Boil only the water you need.", "Walk or cycle one short journey today."], "C58": ["Know someone with a big day coming up? An interview, exam or appointment?", "Send \"Good luck, you've got this.\"", "Follow up afterwards to ask how it went."], "C59": ["Thank a parent or carer for everything they do.", "Mention one thing you're grateful for from growing up.", "Or thank a carer you know for looking after someone."], "C60": ["Ask an older neighbour or relative about their life.", "\"What was it like when you were my age?\" is a great start.", "Listen, and ask one more question."], "P01": ["Jot three things in your phone notes first.", "Pick the one you've never said out loud.", "Tell them in person, or in a message if that's easier."], "P02": ["Ring at a time they're usually free, like after lunch.", "Ask about their week, then ask about their old days.", "No grandparent? An older relative or family friend counts."], "P03": ["A few biscuits, a homemade cake or flowers from the garden.", "Leave it on the doorstep with a short note.", "Sign it, or keep it anonymous for extra fun."], "P04": ["Grab a card from the shop or make one.", "Write three lines: hello, something you appreciate, and a sign-off.", "Post it today so it arrives as a surprise."], "P05": ["Think of the job they keep mentioning: a flat-pack, a garden, a form.", "Offer a time: \"I'm free Saturday morning, shall we tackle it?\"", "Bring snacks and make it fun."], "P06": ["Find them in your contacts or on social media.", "Keep it light: \"Saw something that reminded me of you. How are you?\"", "No pressure if they don't reply straight away."], "P07": ["Write it on a sticky note or the back of a receipt.", "\"You're doing better than you think\" works for anyone.", "Leave it on a bus seat, a library book or a café table."], "P08": ["Find them on LinkedIn, their school or their email.", "Say what they did and where you are now because of it.", "It doesn't have to be long to mean a lot."], "P09": ["Something simple and comforting: soup, pasta bake or a curry.", "Pack it in a container they don't need to return.", "Drop it round, or have it delivered if they're far away."], "P10": ["Pick 8 to 10 songs that remind you of them.", "Add a short note about why one of them matters.", "Share it on Spotify, Apple Music or YouTube."], "P11": ["Next time you meet, say \"This one's on me.\"", "Or send them a coffee voucher out of the blue.", "No reason needed."], "P12": ["Ask what they're learning: a language, a skill, an app.", "Offer 20 minutes of your time this week.", "Be patient and let them do it, not you."], "P13": ["Think of someone who changed things for you: a teacher, a boss, a friend.", "Write what they did, and what your life is like because of it.", "Around 300 words is perfect. Keep it for now, you'll read it to them soon."], "P14": ["Notice the job someone always does: bins, dishes, walking the dog.", "Do it before they get the chance.", "Don't mention it and let them find out."], "P15": ["Fill a small box with snacks, a note and something that reminds you of them.", "Add a photo of you together.", "Post it so it arrives as a surprise."], "P16": ["Next time you see them, stop instead of nodding.", "Ask a real question: \"How long have you lived here?\"", "Share something about yourself too."], "P17": ["Ask \"Mind if I join you?\"", "Start with something easy, like what they're eating or their weekend.", "If they'd rather be alone, that's fine. Asking was the kind part."], "P18": ["Pick a friend you usually just message.", "Call at a sensible time, or text first: \"Free for a quick call?\"", "Five minutes is plenty."], "P19": ["At the till, ask to pay for the next person's drink.", "Leave before they find out, if you like.", "A card saying \"Pass it on\" makes it extra special."], "P20": ["Knock and ask if they need anything from the shop.", "Or offer to take their bins out or collect a prescription.", "Leave your number so they can ask next time."], "P21": ["Look out for the new face at work, the gym or the school gates.", "\"Hi, I'm ... are you new here?\" is all it takes.", "Offer one useful tip, like the best coffee nearby."], "P22": ["Think about what you want to say, and keep it simple.", "\"I'm sorry for ... I've been thinking about it.\"", "Don't expect anything back. Saying it is enough."], "P23": ["Notice something genuinely impressive: their patience, their skill, their kindness.", "Tell them what you saw and why it stood out.", "Keep it short and let them enjoy it."], "P24": ["Look for someone with bags, a buggy or unsteady balance.", "Offer your seat or help with the steps.", "Ask first, then follow their lead."], "P25": ["Search for local volunteering near you or check your council website.", "Food banks, charity shops and litter groups often need a quick hand.", "An hour really does help."], "P26": ["In a meeting, group chat or family dinner, name what someone did well.", "Be specific so it's clearly genuine.", "Watch how much it lifts them."], "P27": ["Send a message: \"Thinking of you. No need to reply.\"", "Offer something practical, like a meal or a walk.", "Check in again in a few days."], "P28": ["Arrange a time to visit or call without saying why.", "Tell them you've written something and ask if you can read it.", "Read it slowly and give them a moment afterwards."], "P29": ["Offer to babysit for an evening or walk the dog.", "Pick a time that suits them.", "Tell them to do something just for themselves."], "P30": ["Think of a tradesperson, colleague or service that did great work.", "Write a review or LinkedIn recommendation saying exactly why.", "Send them the link so they see it."], "P31": ["Pick a date and post a note through doors on your street.", "Keep it easy: tea and biscuits on the drive, or drinks at the local pub.", "Even five neighbours meeting is a win."], "P32": ["In the UK, go to blood.co.uk to book a donation.", "Or sign up to the organ donor register at organdonation.nhs.uk.", "Tell a friend and go together."], "P33": ["Pick a cause you care about: animals, older people, the planet.", "Search Do-it.org or your local volunteer centre.", "Book one afternoon to try it."], "P34": ["Ask them what they'd like, then buy it.", "Ask their name and chat if they want to.", "Look up local homeless services to share if they need help."], "P35": ["Send the first message. Keep it short and warm.", "\"I miss our friendship. Fancy a coffee?\"", "Give them time to reply."], "P36": ["Think of someone new in your line of work.", "Offer a coffee chat, or to look over their CV.", "Share one thing you wish you'd known."], "P37": ["Choose a cause and a challenge: a walk, a run, a swim, a bake sale.", "Set up a page on JustGiving or similar.", "Share it with friends and family."], "P38": ["Call a local care home and ask if they welcome visitors or volunteers.", "Or visit a relative or neighbour in hospital.", "Bring something to chat about, like photos or a newspaper."], "P39": ["Write a post about someone who changed your life.", "Say what they did and what it meant.", "Tag them if they're on there."], "P40": ["Ask a school office about dinner money debts you could clear.", "Library fines or a pre-paid meal at a café count too.", "Do it quietly, without needing thanks."], "P41": ["Invite someone who seems lonely to join you for a cuppa.", "Keep it casual, like \"I'm grabbing a coffee, fancy one?\"", "Listen more than you talk."], "P42": ["Leave a generous tip for someone working a tough shift.", "Write a short note on the receipt: \"Thank you, you were brilliant.\"", "Tell their manager too, if you can."], "P43": ["Take your letter to the person who changed your life.", "Read it aloud, slowly. It's OK to get emotional.", "Leave them the letter to keep."], "P44": ["Pick something simple: a book swap, a litter pick, a kindness board.", "Invite two or three people to start it with you.", "Share it in a local group so others can join."], "P45": ["Plan five small acts across the day.", "Mix them up: a stranger, a friend, family, your community and the planet.", "Tick them off as you go and notice how you feel."]};
+  const ideasOpen = {};
   function setAct(id, a) {
     const box = $(id); box.textContent = "";
     box.append(el("span", "hl", a.h), el("span", "pl", a.l));
+    const list = IDEAS[a.id];
+    if (!list) return;
+    const open = !!ideasOpen[id];
+    const b = el("button", "ideasbtn", (open ? "Hide ideas" : "💡 Ideas for how")); b.type = "button";
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+    b.onclick = e => { e.stopPropagation(); ideasOpen[id] = !open; setAct(id, a); };
+    box.appendChild(b);
+    if (open) { const ul = el("ul", "ideas"); list.forEach(t => ul.appendChild(el("li", null, t))); box.appendChild(ul); }
   }
   const feelEditing = {}; let storyEditing = false, showActs = false, popIndex = -1;
   const reduceMotion = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -930,9 +988,10 @@
     popIndex = shared ? Math.min(mural.rows.length, muralGoal() - 1) : Object.keys(pub.days).filter(d => d.startsWith(monthKey(now.getFullYear(), now.getMonth()))).length;
     setTimeout(() => { popIndex = -1; }, 1500);
     setTimeout(() => { const c = $("count"); c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump"); }, 50);
+    setTimeout(checkMilestone, 1300);
     pub.days[TODAY] = true; pub.last = TODAY; pub.note = ""; pub.at = 0; pub.town = priv.town || "";
     if (!shared) todayDocs = [pub];
-    else { todayTotal++; if (mural.rows.length < muralGoal()) mural.rows.push({ user_id: me, colour: myColour() }); mural.total++; }
+    else { todayTotal++; if (mural.rows.length < muralGoal()) mural.rows.push({ user_id: me, colour: myColour(), style: myStyle() }); mural.total++; }
     persist("pub"); render();
   }
   function showView(v) {
@@ -957,7 +1016,7 @@
   };
   $("skipNote").onclick = () => { if (!storyEditing) { pub.note = ""; } wrapStory(); };
   $("editNote").onclick = () => { storyEditing = true; render(); setTimeout(() => $("note").focus(), 50); };
-  $("pDone").onclick = () => { priv.personal[TODAY] = "done"; persist("priv"); render(); };
+  $("pDone").onclick = () => { priv.personal[TODAY] = "done"; persist("priv"); render(); checkMilestone(); };
   $("pSkip").onclick = () => { priv.personal[TODAY] = "skip"; persist("priv"); render(); };
   $("pSwap").onclick = () => { priv.swaps[TODAY] = (priv.swaps[TODAY] || 0) + 1; persist("priv"); render(); };
   $("pUndo").onclick = () => { delete priv.personal[TODAY]; priv.journal = priv.journal.filter(j => j.date !== TODAY); persist("priv"); render(); };
@@ -1074,6 +1133,49 @@
   };
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
+  // milestones
+  const MILES = [7, 15, 50, 100, 250, 500, 1000];
+  function checkMilestone() {
+    const n = totalActs(); priv.miles = priv.miles || [];
+    const hit = MILES.filter(m => n >= m && !priv.miles.includes(m));
+    if (!hit.length) return;
+    const m = hit[hit.length - 1]; priv.miles.push(...hit); saveLocal();
+    $("mileNum").textContent = m;
+    const lines = { 7: "A whole week's worth of kindness. That's a habit forming.", 15: "Fifteen people's days made better, at least.", 50: "Fifty! You're one of the kindest people on RAOK.", 100: "One hundred acts of kindness. That's extraordinary." };
+    $("mileSub").textContent = lines[m] || "You keep making the world a little kinder. Thank you.";
+    const st = STYLES.find(x => x[2] === m);
+    $("mileUnlock").classList.toggle("hidden", !st); $("mileTry").classList.toggle("hidden", !st);
+    if (st) { $("mileStyleName").textContent = st[1]; const h = $("mileHand"); h.textContent = ""; drawHand(h, 0, 0, 24, myColour(), st[0], 1); $("mileTry").dataset.style = st[0]; }
+    $("mileSheet").classList.add("show");
+    try { navigator.vibrate && navigator.vibrate([30, 60, 30, 60, 60]); } catch (e) {}
+  }
+  $("mileClose").onclick = () => $("mileSheet").classList.remove("show");
+  $("mileTry").onclick = () => { priv.style = $("mileTry").dataset.style; persist(); $("mileSheet").classList.remove("show"); render(); openColours(); };
+  $("mileShare").onclick = async () => {
+    const t = "I've just done " + $("mileNum").textContent + " acts of kindness with RAOK. Join in: raokapp.com";
+    try { if (navigator.share) await navigator.share({ text: t }); else { await navigator.clipboard.writeText(t); $("mileShare").textContent = "Copied ✓"; } } catch (e) {}
+  };
+
+  // mural recap: what happened since you last looked
+  function checkRecap() {
+    const k = monthKey(now.getFullYear(), now.getMonth()), seen = priv.muralSeen;
+    const firstLook = !recapChecked; recapChecked = true;
+    if (firstLook && seen && seen.m === k && mural.total > seen.n && Date.now() - (seen.at || 0) > 20 * 60000) {
+      const n = Math.min(mural.total, muralGoal()) - Math.min(seen.n, muralGoal()), extra = mural.total - seen.n;
+      $("recapText").textContent = extra + " new handprint" + (extra === 1 ? "" : "s") + " joined the mural since you last looked";
+      $("recap").classList.remove("hidden");
+      $("recap").dataset.from = Math.min(seen.n, muralGoal()); $("recap").dataset.to = Math.min(mural.total, muralGoal());
+      if (n <= 0) $("recapSee").textContent = "See the mural";
+    }
+    priv.muralSeen = { m: k, n: mural.total, at: Date.now() }; saveLocal();
+  }
+  $("recapX").onclick = () => $("recap").classList.add("hidden");
+  $("recapSee").onclick = () => {
+    $("recap").classList.add("hidden");
+    $("muralCard").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" });
+    setTimeout(() => { recapPop = [+$("recap").dataset.from, +$("recap").dataset.to]; render(); setTimeout(() => { recapPop = null; }, 3000); }, 450);
+  };
+
   // done-for-today
   $("toggleActs").onclick = () => { showActs = !showActs; render(); if (showActs) setTimeout(() => $("acts").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }), 50); };
   $("doneMural").onclick = () => $("muralCard").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" });
@@ -1110,17 +1212,31 @@
       list.forEach(([name, c]) => {
         const b = el("button", c === pickedColour ? "on" : ""); b.type = "button";
         const dot = el("i"); dot.style.background = c; b.append(dot, document.createTextNode(name));
-        b.onclick = () => { pickedColour = c; wrap.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); };
+        b.onclick = () => { pickedColour = c; wrap.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); renderStyles(); };
         box.appendChild(b);
       });
       wrap.appendChild(box);
     });
+    pickedStyle = myStyle(); renderStyles();
     $("colourSheet").classList.add("show");
+  }
+  let pickedStyle = "classic";
+  function renderStyles() {
+    const box = $("styles"); box.textContent = ""; const n = totalActs();
+    STYLES.forEach(([key, name, need]) => {
+      const b = el("button", key === pickedStyle ? "on" : ""); b.type = "button";
+      const NS = "http://www.w3.org/2000/svg", sv = document.createElementNS(NS, "svg"); sv.setAttribute("width", "34"); sv.setAttribute("height", "34"); sv.setAttribute("viewBox", "0 0 24 24"); sv.setAttribute("aria-hidden", "true");
+      drawHand(sv, 0, 0, 24, pickedColour || myColour(), key, 1);
+      b.append(sv, document.createTextNode(name));
+      if (n < need) { b.disabled = true; b.append(el("span", "lock", "🔒 " + need + " acts")); b.setAttribute("aria-label", name + ", unlocks at " + need + " acts"); }
+      b.onclick = () => { pickedStyle = key; renderStyles(); };
+      box.appendChild(b);
+    });
   }
   $("pickColour").onclick = openColours;
   $("saveColour").onclick = () => {
-    priv.colour = pickedColour; $("colourSheet").classList.remove("show");
-    if (shared) mural.rows.forEach(r => { if (r.user_id === me) r.colour = pickedColour; });
+    priv.colour = pickedColour; priv.style = pickedStyle; $("colourSheet").classList.remove("show");
+    if (shared) mural.rows.forEach(r => { if (r.user_id === me) { r.colour = pickedColour; r.style = pickedStyle; } });
     persist(); render();
   };
   $("colourSheet").onclick = e => { if (e.target === $("colourSheet")) $("colourSheet").classList.remove("show"); };
