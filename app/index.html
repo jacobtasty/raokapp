@@ -539,6 +539,7 @@
         <button class="pill" type="button" data-ts="1" aria-label="Large text" style="font-size:16px">A</button>
         <button class="pill" type="button" data-ts="2" aria-label="Larger text" style="font-size:18px">A</button>
       </div>
+      <p class="small" id="diag" style="color:var(--muted);margin:0"></p>
       <button class="link" id="resetApp">Start again from scratch</button>
       <button class="link" id="deleteData" style="color:#B23A57">Delete my data</button>
       </div>
@@ -772,7 +773,7 @@
       catch (e) { if (noStyleCol || !/rest 400/.test(e.message)) throw e; noStyleCol = true; r2 = await sb(q2("user_id,colour"), { headers: { Prefer: "count=exact" } }); }
       const mrows = await r2.json();
       mural = { rows: mrows, total: totalOf(r2, mrows.length) };
-      if (!sbOk && pub.days[TODAY] && !rows.some(x => x.user_id === me)) { sbOk = true; shared = true; return pushToday(); } // tick from before accounts
+      if (!sbOk && pub.days[TODAY] && !rows.some(x => x.user_id === me)) { sbOk = true; shared = true; logOpen(); return pushToday(); } // tick from before accounts
       sbOk = true; shared = true; notice("");
       checkRecap();
       logOpen();
@@ -1140,6 +1141,7 @@
     renderMural();
     layoutToday();
     renderAcct();
+    renderDiag();
     document.querySelectorAll(".feel[data-feel]").forEach(renderFeel);
     $("pFeelBox").classList.toggle("hidden", priv.personal[TODAY] !== "done");
 
@@ -1376,13 +1378,24 @@
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
   // ---------- anonymous "came back today" log, for day 1 / 7 / 30 return rates ----------
-  let opensOff = false;
+  var opensOff = false;
+  var openStatus = "";
   async function logOpen() {
-    if (opensOff || priv.openLogged === TODAY) return;
+    if (opensOff || priv.openLogged === TODAY) { renderDiag(); return; }
     try {
-      await sb("app_opens?on_conflict=user_id,day", { method: "POST", headers: { Prefer: "resolution=ignore-duplicates,return=minimal" }, body: { user_id: me, day: TODAY } });
-      priv.openLogged = TODAY; saveLocal();
-    } catch (e) { if (/rest 40[04]/.test(e.message)) opensOff = true; }
+      const s = await ensureSession();
+      const r = await fetch(SB_URL + "/rest/v1/app_opens?on_conflict=user_id,day", { method: "POST",
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + s.access_token, "Content-Type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+        body: JSON.stringify({ user_id: s.user_id, day: TODAY }) });
+      if (!r.ok) { let t = ""; try { t = (await r.json()).message || ""; } catch (e) {} throw new Error(r.status + (t ? " " + t : "")); }
+      priv.openLogged = TODAY; openStatus = ""; saveLocal();
+    } catch (e) { openStatus = String(e.message || e).slice(0, 120); if (/^40[04]/.test(openStatus)) opensOff = true; }
+    renderDiag();
+  }
+  function renderDiag() {
+    const d = $("diag"); if (!d) return;
+    d.textContent = "Connection: " + (shared ? "connected ✓" : "not connected") + " · Today's visit: " +
+      (priv.openLogged === TODAY ? "recorded ✓" : openStatus ? "not recorded (" + openStatus + ")" : "checking…");
   }
 
   // ---------- optional email: keep progress across phones ----------
