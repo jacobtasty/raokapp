@@ -240,7 +240,7 @@
   :focus-visible{outline:3px solid var(--teal);outline-offset:2px}
   @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
   .tag.mural{background:#FCE3E8;color:#B23A57}
-  .muralbox{border-radius:16px;background:linear-gradient(180deg,#FFFDF9,#FFF4EA);border:1px solid var(--line);padding:10px}
+  .muralbox{border-radius:16px;background:#F5ECE4;border:1px solid var(--line);padding:6px;overflow:hidden}
   .muralbox svg{display:block;width:100%;height:auto}
   .mrow{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--soft)}
   .mrow b{font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--ink)}
@@ -409,7 +409,7 @@
       <div class="muralbox"><svg id="muralSvg" viewBox="0 0 300 300" role="img" aria-label="Community handprint mural"></svg></div>
       <div class="mrow"><span><b id="muralCount">0</b> <span id="muralGoal"></span></span><span id="muralPct"></span></div>
       <div class="mbar"><i id="muralFill" style="width:0"></i></div>
-      <p class="small" id="muralSub">Every community act adds a handprint. Fill the mural together to reveal the hidden picture.</p>
+      <p class="small" id="muralSub">Every community act adds a handprint. Let's fill the mural together.</p>
       <div class="row">
         <button class="pill" id="findMine" type="button">Find my handprints</button>
         <button class="pill" id="pickColour" type="button">My handprint</button>
@@ -566,7 +566,7 @@
     <rect x="9.6" y="1.8" width="2.7" height="11" rx="1.35"/>
     <rect x="12.8" y="2.6" width="2.7" height="10.4" rx="1.35"/>
     <rect x="15.9" y="5.2" width="2.5" height="8.6" rx="1.25"/>
-    <rect x="1.6" y="11.2" width="2.7" height="8" rx="1.35" transform="rotate(-38 3 15.2)"/>
+    <rect x="3.5" y="11.4" width="3" height="8" rx="1.5" transform="rotate(-36 5 15.4)"/>
   </symbol>
   <pattern id="pStripes" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><rect width="1.3" height="3" fill="#fff" fill-opacity=".55"/></pattern>
   <pattern id="pDots" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.6" r=".75" fill="#fff" fill-opacity=".7"/></pattern>
@@ -802,13 +802,27 @@
   // hidden pictures, drawn on a 300 x 300 board
   const starPath = (() => { let d = ""; for (let i = 0; i < 10; i++) { const r = i % 2 ? 58 : 138, a = -Math.PI / 2 + i * Math.PI / 5; d += (i ? "L" : "M") + (150 + r * Math.cos(a)).toFixed(1) + " " + (160 + r * Math.sin(a)).toFixed(1) + " "; } return d + "Z"; })();
   const PICTURES = {
-    heart: { name: "heart", path: "M150 262 C 92 222, 26 172, 34 108 C 40 62, 92 40, 126 66 C 138 75, 146 88, 150 98 C 154 88, 162 75, 174 66 C 208 40, 260 62, 266 108 C 274 172, 208 222, 150 262 Z" },
-    tree: { name: "Christmas tree", path: "M150 22 L222 112 L190 112 L248 186 L212 186 L268 258 L32 258 L88 186 L52 186 L110 112 L78 112 Z M124 256 L176 256 L176 292 L124 292 Z" },
-    star: { name: "star", path: starPath }
+    heart: { name: "heart", in: ["#E8607A", "#F07E93", "#D94B68", "#F59AAE"], out: ["#2BB8AE", "#7FD3C4", "#0C8079", "#9ED8CC", "#4E9A2A", "#86C26A"], path: "M150 262 C 92 222, 26 172, 34 108 C 40 62, 92 40, 126 66 C 138 75, 146 88, 150 98 C 154 88, 162 75, 174 66 C 208 40, 260 62, 266 108 C 274 172, 208 222, 150 262 Z" },
+    tree: { name: "Christmas tree", in: ["#2E8B3A", "#4E9A2A", "#1F6E32", "#6BB04A"], out: ["#BFE3F2", "#9CCFE8", "#DCEFF7", "#7FB8DC", "#F4F8FB"], path: "M150 22 L222 112 L190 112 L248 186 L212 186 L268 258 L32 258 L88 186 L52 186 L110 112 L78 112 Z M124 256 L176 256 L176 292 L124 292 Z" },
+    star: { name: "star", in: ["#F2B33D", "#F7C85E", "#E39A1F", "#FFD978"], out: ["#3F4C8F", "#5A68B0", "#2E3A73", "#7A86C8"], path: starPath }
   };
   const MONTH_PICTURE = { "2026-11": "heart", "2026-12": "tree" };
   const ROTATION = ["star", "heart", "tree"];
   const monthPicture = (y = now.getFullYear(), m = now.getMonth()) => PICTURES[MONTH_PICTURE[monthKey(y, m)] || ROTATION[(y * 12 + m) % ROTATION.length]];
+  // "picture": the hidden picture's own colours (like the first mockups)
+  // "mine": your own colour inside the picture, the picture's background colours outside
+  var MURAL_LOOK = "picture";
+  // pictures only look good with lots of handprints, so they switch on once a month's target is 400+
+  const PICTURE_MIN = 400;
+  const isPale = hex => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255 > .74; };
+  const usePicture = () => muralGoal() >= PICTURE_MIN;
+  function handLook(r, c, i, done) {
+    if (!usePicture()) return { col: /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id), op: 1 };
+    const pic = monthPicture(), pal = c.inside ? pic.in : pic.out;
+    const own = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
+    const col = MURAL_LOOK === "mine" && c.inside ? own : pal[hash(i + ":" + r.user_id) % pal.length];
+    return { col, op: 1 };
+  }
   let insideCtx = null;
   function insideTest(picture) {
     try {
@@ -834,21 +848,24 @@
     cells.forEach((c, i) => {
       const r = rows[i];
       if (!r) { const d = document.createElementNS(NS, "circle"); d.setAttribute("cx", c.cx); d.setAttribute("cy", c.cy); d.setAttribute("r", Math.max(1.5, size * .06)); d.setAttribute("fill", "#E9DED3"); svg.appendChild(d); return; }
-      const hs = size * .92, rot = (hash(i + ":" + r.user_id) % 50) - 25;
+      const hh = hash(i + ":" + r.user_id), hs = size * 1.38, rot = (hh % 60) - 30;
+      const jx = ((hh >> 6) % 100 / 100 - .5) * size * .28, jy = ((hh >> 13) % 100 / 100 - .5) * size * .28;
+      c = { cx: Math.min(300 - hs * .35, Math.max(hs * .35, c.cx + jx)), cy: Math.min(300 - hs * .35, Math.max(hs * .35, c.cy + jy)), inside: c.inside };
       const g = document.createElementNS(NS, "g");
       const popping = o.animate && ((i === popIndex && mine(r)) || (recapPop && i >= recapPop[0] && i < recapPop[1]));
       if (popping) { g.setAttribute("class", "pop"); if (recapPop && !(i === popIndex)) g.style.animationDelay = ((i - recapPop[0]) * 90) + "ms"; }
       const gr = document.createElementNS(NS, "g"); gr.setAttribute("transform", "rotate(" + rot + " " + c.cx + " " + c.cy + ")"); g.appendChild(gr);
       // the picture always shows: inside hands are bright, outside hands stay soft, even when finished
-      let op = c.inside ? 1 : (done ? .16 : .22);
-      if (o.findMine) op = mine(r) ? 1 : .08;
-      const col = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
+      const lk = handLook(r, c, i, done);
+      let op = lk.op;
+      if (o.findMine) op = mine(r) ? 1 : .12;
+      const col = lk.col;
       const st = mine(r) && !shared ? myStyle() : (r.style || "classic");
       const u = drawHand(gr, c.cx - hs / 2, c.cy - hs / 2, hs, col, st, op);
       if (o.findMine && mine(r)) { u.setAttribute("stroke", "#2B2A33"); u.setAttribute("stroke-width", "1.2"); }
+      else if (isPale(col) && !u.getAttribute("stroke")) { u.setAttribute("stroke", "#A8927F"); u.setAttribute("stroke-width", ".9"); u.setAttribute("stroke-opacity", ".6"); }
       svg.appendChild(g);
     });
-    if (done && !o.findMine) { const ol = document.createElementNS(NS, "path"); ol.setAttribute("d", monthPicture().path); ol.setAttribute("class", "outline"); svg.appendChild(ol); }
   }
 
   function renderMural() {
@@ -865,7 +882,8 @@
     svg.setAttribute("aria-label", "Community mural: " + Math.min(total, goal) + " of " + goal + " handprints" + (rows.filter(mine).length ? ", " + rows.filter(mine).length + " of them yours" : ""));
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(), left = lastDay - now.getDate();
     const pic = monthPicture(), nextM = MONTHS[(now.getMonth() + 1) % 12];
-    $("muralTitle").textContent = done ? "We did it! Together we made a " + pic.name : MONTHS[now.getMonth()] + " mural: a hidden picture is appearing…";
+    $("muralTitle").textContent = usePicture() ? (done ? "We did it! Together we made a " + pic.name : MONTHS[now.getMonth()] + " mural: a hidden picture is appearing…")
+      : (done ? "We did it! The " + MONTHS[now.getMonth()] + " mural is full" : MONTHS[now.getMonth()] + " mural: every act adds a handprint");
     $("muralShare").classList.toggle("hidden", !done);
     if (done && shared && !(priv.revealSeen || {})[monthKey(now.getFullYear(), now.getMonth())] && !$("revealSheet").classList.contains("show")) setTimeout(openReveal, 600);
     $("muralTag").textContent = shared ? "Community mural" : "Preview · mural";
@@ -877,7 +895,7 @@
     const myN = rows.filter(mine).length;
     $("muralSub").textContent = !shared ? "Only your own handprints show for now. Everyone's appear once you're connected." :
       done ? "Every handprint is a real act of kindness" + (myN ? ", and " + myN + " of them " + (myN === 1 ? "is" : "are") + " yours." : ".") + " " + nextM + "'s mural starts on 1 " + nextM + ". What will it show?" :
-      "Every community act adds a handprint. Fill it together to reveal the hidden picture." + (myN ? " " + myN + " " + (myN === 1 ? "is" : "are") + " yours." : "");
+      (usePicture() ? "Every community act adds a handprint. Fill it together to reveal the hidden picture." : "Every community act adds a handprint, in that person's colour. Let's fill it together.") + (myN ? " " + myN + " " + (myN === 1 ? "is" : "are") + " yours." : "");
     $("findMine").classList.toggle("on", findMine);
     $("findMine").textContent = findMine ? "Show everyone" : "Find my handprints";
     $("handlineUse").setAttribute("fill", myColour());
@@ -1487,7 +1505,7 @@
     const goal = muralGoal(), k = monthKey(now.getFullYear(), now.getMonth()), pic = monthPicture(), nextM = MONTHS[(now.getMonth() + 1) % 12];
     const mine = r => r.user_id === me;
     paintMural($("revealSvg"), mural.rows, goal, true, { mine });
-    $("revealSub").textContent = "Together, " + Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness made this " + MONTHS[now.getMonth()] + " " + pic.name + ".";
+    $("revealSub").textContent = "Together, " + Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness " + (usePicture() ? "made this " + MONTHS[now.getMonth()] + " " + pic.name + "." : "filled the " + MONTHS[now.getMonth()] + " mural.");
     const myN = mural.rows.filter(mine).length;
     $("revealMine").textContent = myN ? myN + " of these handprints " + (myN === 1 ? "is" : "are") + " yours. Thank you." : "Every handprint is a real act of kindness.";
     $("revealNext").textContent = nextM + "'s mural starts on 1 " + nextM + ". What will it show?";
@@ -1503,24 +1521,26 @@
     const grad = g.createLinearGradient(0, 0, 0, 1080); grad.addColorStop(0, "#D9F6EE"); grad.addColorStop(.6, "#FFF8F1"); grad.addColorStop(1, "#FFF8F1");
     g.fillStyle = grad; g.fillRect(0, 0, 1080, 1080);
     g.fillStyle = "#386C1C"; g.font = "700 56px 'Space Grotesk', sans-serif"; g.fillText("RAOK", 80, 120);
-    g.fillStyle = "#2B2A33"; g.font = "700 58px 'Space Grotesk', sans-serif"; g.fillText("Together we made a " + pic.name, 80, 200);
+    g.fillStyle = "#2B2A33"; g.font = "700 58px 'Space Grotesk', sans-serif"; g.fillText(usePicture() ? "Together we made a " + pic.name : "Together we filled the mural", 80, 200);
     const S = 700 / 300, ox = 190, oy = 250;
     g.save(); g.fillStyle = "#fff"; g.beginPath(); g.roundRect ? g.roundRect(ox - 20, oy - 20, 740, 740, 36) : g.rect(ox - 20, oy - 20, 740, 740); g.fill(); g.restore();
     const R = [[6.2, 10.5, 11.6, 11.5, 4.6], [6.4, 3.6, 2.7, 10, 1.35], [9.6, 1.8, 2.7, 11, 1.35], [12.8, 2.6, 2.7, 10.4, 1.35], [15.9, 5.2, 2.5, 8.6, 1.25]];
     cells.forEach((c, i) => {
       const r = mural.rows[i]; if (!r) return;
-      const hs = size * .92 * S, rot = ((hash(i + ":" + r.user_id) % 50) - 25) * Math.PI / 180, k = hs / 24;
-      g.save(); g.translate(ox + c.cx * S, oy + c.cy * S); g.rotate(rot); g.translate(-hs / 2, -hs / 2);
-      g.globalAlpha = c.inside ? 1 : .16; g.fillStyle = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
-      R.forEach(([x, y, w, h, rr]) => { g.beginPath(); g.roundRect ? g.roundRect(x * k, y * k, w * k, h * k, rr * k) : g.rect(x * k, y * k, w * k, h * k); g.fill(); });
-      g.save(); g.translate(3 * k, 15.2 * k); g.rotate(-38 * Math.PI / 180); g.beginPath(); g.roundRect ? g.roundRect(-1.35 * k, -4 * k, 2.7 * k, 8 * k, 1.35 * k) : g.rect(-1.35 * k, -4 * k, 2.7 * k, 8 * k); g.fill(); g.restore();
+      const hh = hash(i + ":" + r.user_id), hs0 = size * 1.38, hs = hs0 * S, rot = ((hh % 60) - 30) * Math.PI / 180, k = hs / 24;
+      const jx = ((hh >> 6) % 100 / 100 - .5) * size * .28, jy = ((hh >> 13) % 100 / 100 - .5) * size * .28;
+      const px = Math.min(300 - hs0 * .35, Math.max(hs0 * .35, c.cx + jx)), py = Math.min(300 - hs0 * .35, Math.max(hs0 * .35, c.cy + jy));
+      g.save(); g.translate(ox + px * S, oy + py * S); g.rotate(rot); g.translate(-hs / 2, -hs / 2);
+      const lk = handLook(r, c, i, true); g.globalAlpha = lk.op; g.fillStyle = lk.col;
+      const pale = isPale(lk.col); g.strokeStyle = "rgba(168,146,127,.6)"; g.lineWidth = .9 * k;
+      R.forEach(([x, y, w, h, rr]) => { g.beginPath(); g.roundRect ? g.roundRect(x * k, y * k, w * k, h * k, rr * k) : g.rect(x * k, y * k, w * k, h * k); g.fill(); if (pale) g.stroke(); });
+      g.save(); g.translate(5 * k, 15.4 * k); g.rotate(-36 * Math.PI / 180); g.beginPath(); g.roundRect ? g.roundRect(-1.5 * k, -4 * k, 3 * k, 8 * k, 1.5 * k) : g.rect(-1.5 * k, -4 * k, 3 * k, 8 * k); g.fill(); if (pale) g.stroke(); g.restore();
       g.restore();
     });
-    try { g.save(); g.translate(ox, oy); g.scale(S, S); g.strokeStyle = "rgba(43,42,51,.55)"; g.lineWidth = 3; g.lineJoin = "round"; g.stroke(new Path2D(pic.path)); g.restore(); } catch (e) {}
     g.fillStyle = "#4F4B57"; g.font = "500 36px Inter, sans-serif"; g.fillText(Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness · " + MONTHS[now.getMonth()] + " " + now.getFullYear(), 80, 1010);
     g.fillStyle = "#386C1C"; g.font = "700 36px 'Space Grotesk', sans-serif"; const t = "raokapp.com"; g.fillText(t, 1000 - g.measureText(t).width, 1010);
     $("cardImg").src = cv.toDataURL("image/png");
-    shareText = "Together, " + Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness made this " + MONTHS[now.getMonth()] + " " + pic.name + " on RAOK 💚 Join in: raokapp.com";
+    shareText = "Together, " + Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness " + (usePicture() ? "made this " + MONTHS[now.getMonth()] + " " + pic.name : "filled the " + MONTHS[now.getMonth()] + " mural") + " on RAOK 💚 Join in: raokapp.com";
     $("cardSheet").classList.add("show");
   }
   $("revealShare").onclick = () => { $("revealSheet").classList.remove("show"); muralCard(); };
