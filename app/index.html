@@ -28,7 +28,7 @@
   .brand b{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.5px;color:var(--green);line-height:1.1}
   .brand span{font-size:14px;color:var(--muted)}
   .day{font-size:12px;font-weight:600;padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--soft);white-space:nowrap}
-  nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 0 12px}
+  nav{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px;padding:4px 0 12px}
   nav button{min-height:44px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--ink);font-size:14px;font-weight:600}
   nav button.on{background:var(--green-bg);border-color:var(--green-line);color:var(--green)}
   .notice{font-size:13px;background:#fff;color:var(--soft);border:1px dashed var(--line2);border-radius:12px;padding:9px 12px;margin:0 0 12px}
@@ -166,6 +166,11 @@
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
   .feel.picked{display:block}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips button{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--ink);font-size:14px;font-weight:600}
+  .chips button.on{background:var(--teal-tint);border-color:var(--teal);color:var(--teal-dark)}
+  .tinput{width:100%;box-sizing:border-box;min-height:46px;border-radius:12px;border:1px solid var(--line2);background:var(--cream);padding:0 14px;font:inherit;font-size:16px;color:var(--ink)}
+  #fbMsg{font-size:16px}
   .sethead{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:0;padding:0;min-height:32px;color:var(--soft)}
   .sethead .chev{transition:transform .2s}
   .sethead[aria-expanded=true] .chev{transform:rotate(180deg)}
@@ -262,6 +267,7 @@
   <nav>
     <button data-v="today" class="on">Community</button>
     <button data-v="you">You</button>
+    <button data-v="feedback">App feedback</button>
   </nav>
   <div id="notice" class="notice hidden"></div>
 
@@ -388,6 +394,47 @@
   </section>
 
   <!-- YOU -->
+  <!-- APP FEEDBACK (testing) -->
+  <section id="view-feedback" class="stack hidden">
+    <div class="card" id="fbCard">
+      <span class="label">App feedback</span>
+      <h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px">Help shape RAOK</h2>
+      <p class="small" style="color:var(--soft);margin:0">You're one of the first people to try the app. Anything you think, good or bad, goes straight to Jacob.</p>
+      <form id="fbForm" name="app-feedback" method="POST" data-netlify="true" netlify-honeypot="company" class="stack" novalidate>
+        <input type="hidden" name="form-name" value="app-feedback">
+        <p class="hp" style="position:absolute;left:-9999px" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></p>
+        <input type="hidden" name="rating">
+        <input type="hidden" name="about">
+        <input type="hidden" name="device">
+        <input type="hidden" name="app_info">
+
+        <p class="flabel">How do you feel about the app so far?</p>
+        <div class="feel" id="fbRating" role="group" aria-label="Rating"></div>
+
+        <p class="flabel">What's it about? <span style="font-weight:500;color:var(--muted)">(optional)</span></p>
+        <div class="chips" id="fbAbout" role="group" aria-label="Topic"></div>
+
+        <label><p class="flabel">Tell us anything</p>
+        <textarea name="message" id="fbMsg" rows="5" maxlength="2000" placeholder="What did you like? What was confusing or didn't work? Any ideas?"></textarea></label>
+
+        <label><p class="flabel">Your name <span style="font-weight:500;color:var(--muted)">(optional)</span></p>
+        <input class="tinput" name="name" autocomplete="name"></label>
+        <label><p class="flabel">Email, if you're happy for Jacob to reply <span style="font-weight:500;color:var(--muted)">(optional)</span></p>
+        <input class="tinput" name="email" type="email" autocomplete="email" inputmode="email"></label>
+
+        <p class="small" id="fbErr" style="color:#B23A57;margin:0" role="alert"></p>
+        <button class="big" id="fbSend" type="submit">Send feedback</button>
+        <p class="small" style="color:var(--muted);margin:0">To help fix problems, we also send your phone type, screen size, town, comfort level and how many acts you have done. Nothing private, like your journal or feelings, is ever included.</p>
+      </form>
+    </div>
+    <div class="card hidden" id="fbThanks" style="text-align:center">
+      <div style="font-size:44px" aria-hidden="true">💚</div>
+      <h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px">Thank you!</h2>
+      <p class="small" style="color:var(--soft)">Your feedback has gone to Jacob. It really helps make RAOK better.</p>
+      <button class="pill" id="fbAgain" type="button">Send more feedback</button>
+    </div>
+  </section>
+
   <section id="view-you" class="stack hidden">
     <div class="tiles">
       <div class="tile"><span class="t">Current streak</span><b id="curStreak">0</b><span class="u">days</span></div>
@@ -923,7 +970,7 @@
 
     renderMural();
     layoutToday();
-    document.querySelectorAll(".feel").forEach(renderFeel);
+    document.querySelectorAll(".feel[data-feel]").forEach(renderFeel);
     $("pFeelBox").classList.toggle("hidden", priv.personal[TODAY] !== "done");
 
     // stories
@@ -1004,7 +1051,7 @@
   }
   function showView(v) {
     document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.v === v));
-    ["today", "you"].forEach(k => $("view-" + k).classList.toggle("hidden", k !== v));
+    ["today", "you", "feedback"].forEach(k => $("view-" + k).classList.toggle("hidden", k !== v));
     window.scrollTo(0, 0);
   }
   $("didIt").onclick = markDone;
@@ -1190,6 +1237,47 @@
     const open = $("setBody").classList.toggle("hidden") === false;
     $("setToggle").setAttribute("aria-expanded", open ? "true" : "false");
   };
+
+  // ---------- App feedback (sent to Netlify Forms) ----------
+  const FB_RATE = [["😍", "Love it"], ["🙂", "Like it"], ["😐", "It's OK"], ["😕", "Not sure"], ["😣", "Don't like it"]];
+  const FB_ABOUT = ["Daily acts", "Mural", "Streaks", "Design", "Something broke", "Idea", "Other"];
+  const fb = { rating: "", about: [] };
+  function renderFb() {
+    const r = $("fbRating"); r.textContent = "";
+    FB_RATE.forEach(([e, name]) => {
+      const b = el("button", fb.rating === name ? "on" : ""); b.type = "button"; b.setAttribute("aria-pressed", fb.rating === name ? "true" : "false");
+      const em = el("span", null, e); em.setAttribute("aria-hidden", "true"); b.append(em, document.createTextNode(name));
+      b.onclick = () => { fb.rating = fb.rating === name ? "" : name; renderFb(); };
+      r.appendChild(b);
+    });
+    const a = $("fbAbout"); a.textContent = "";
+    FB_ABOUT.forEach(name => {
+      const on = fb.about.includes(name), b = el("button", on ? "on" : "", name); b.type = "button"; b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.onclick = () => { fb.about = on ? fb.about.filter(x => x !== name) : fb.about.concat(name); renderFb(); };
+      a.appendChild(b);
+    });
+  }
+  renderFb();
+  $("fbForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = $("fbForm");
+    if (!fb.rating && !$("fbMsg").value.trim()) { $("fbErr").textContent = "Pick how you feel or write a message, then send."; return; }
+    $("fbErr").textContent = "";
+    f.rating.value = fb.rating; f.about.value = fb.about.join(", ");
+    f.device.value = navigator.userAgent + " | screen " + screen.width + "x" + screen.height + (matchMedia("(display-mode: standalone)").matches ? " | home screen app" : " | browser");
+    f.app_info.value = "acts: " + totalActs() + " | streak days: " + Object.keys(pub.days).length + " | level: " + (priv.level || "-") + " | town: " + (priv.town || "-") + " | connected: " + (shared ? "yes" : "no");
+    $("fbSend").disabled = true; $("fbSend").textContent = "Sending…";
+    try {
+      const r = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(new FormData(f)).toString() });
+      if (!r.ok) throw new Error(r.status);
+      f.reset(); fb.rating = ""; fb.about = []; renderFb();
+      $("fbCard").classList.add("hidden"); $("fbThanks").classList.remove("hidden"); window.scrollTo(0, 0);
+    } catch (err) {
+      $("fbErr").textContent = "That didn't send. Check your signal and try again.";
+    }
+    $("fbSend").disabled = false; $("fbSend").textContent = "Send feedback";
+  };
+  $("fbAgain").onclick = () => { $("fbThanks").classList.add("hidden"); $("fbCard").classList.remove("hidden"); };
 
   // done-for-today
   $("toggleActs").onclick = () => { showActs = !showActs; render(); if (showActs) setTimeout(() => $("acts").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }), 50); };
