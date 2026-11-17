@@ -1321,8 +1321,10 @@
     if (!r.ok) { const e = new Error(j.msg || j.error_description || j.message || ("auth " + r.status)); e.status = r.status; e.code = j.error_code || j.code; throw e; }
     return j;
   }
+  const EMAIL_READY = false; // switch to true once custom SMTP + code templates are set up in Supabase
   function renderAcct() {
     const email = session && session.email;
+    if (!EMAIL_READY && !email) { $("acctCard").classList.add("hidden"); return; }
     $("acctCard").classList.toggle("hidden", !shared && !email);
     $("acctIn").classList.toggle("hidden", !email);
     $("acctOut").classList.toggle("hidden", !!email || !$("acctForm").classList.contains("hidden"));
