@@ -166,6 +166,14 @@
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
   .feel.picked{display:block}
+  #muralSvg .outline,#revealSvg .outline{fill:none;stroke:#2B2A33;stroke-opacity:.55;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+  #revealSvg .outline{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 2.4s .6s ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .reveal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;background:linear-gradient(180deg,#0C8079 0,#1C9A8F 45%,#FFF8F1 45%)}
+  .reveal.show{display:flex}
+  .reveal .box{width:100%;max-width:400px;max-height:100%;overflow:auto;background:#fff;border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:12px;text-align:center;box-shadow:0 20px 50px rgba(12,128,121,.25)}
+  .reveal h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:32px;color:var(--teal-dark)}
+  .reveal .muralbox{animation:pop .7s cubic-bezier(.3,1.5,.5,1) both}
   .tagline{margin:-4px 0 12px;font-size:15px;font-weight:600;color:var(--soft);text-align:center}
   .easybtn{align-self:flex-start;background:none;border:0;padding:4px 0;margin-top:2px;color:var(--soft);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
   .easytag{display:inline-block;align-self:flex-start;margin-bottom:6px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green);background:var(--green-bg);border:1px solid var(--green-line);border-radius:999px;padding:3px 10px}
@@ -406,6 +414,7 @@
         <button class="pill" id="findMine" type="button">Find my handprints</button>
         <button class="pill" id="pickColour" type="button">My handprint</button>
       </div>
+      <button class="pill primary hidden" id="muralShare" type="button">Share the finished mural</button>
     </div>
 
     <div class="sechead"><h2>Today's stories</h2><span id="storiesTag">Live</span></div>
@@ -589,6 +598,16 @@
   <button class="big" id="ageYes" type="button">Yes, I'm 16 or over</button>
   <button class="pill" id="ageNo" type="button">No, I'm under 16</button>
   <p class="small" style="margin:0"><a href="/privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
+</div></div>
+
+<div class="reveal" id="revealSheet" role="dialog" aria-labelledby="revealTitle"><div class="box">
+  <div style="font-size:34px" aria-hidden="true">🎉</div>
+  <h2 id="revealTitle">We did it!</h2>
+  <p class="sub" id="revealSub" style="margin:0"></p>
+  <div class="muralbox"><svg id="revealSvg" viewBox="0 0 300 300" role="img"></svg></div>
+  <p class="small" id="revealMine" style="margin:0;color:var(--soft)"></p>
+  <div class="row"><button class="pill" id="revealClose" type="button">Close</button><button class="pill primary" id="revealShare" type="button">Share the mural</button></div>
+  <p class="small" id="revealNext" style="margin:0;color:var(--muted)"></p>
 </div></div>
 
 <div class="overlay" id="mileSheet"><div class="sheet mstone" role="dialog" aria-labelledby="mileTitle">
@@ -776,21 +795,62 @@
     if (style === "sparkle") { const k = size / 24; mk("use", { href: "#spark", x: x + 17 * k, y: y - 1 * k, width: 7 * k, height: 7 * k, fill: "#F2B33D", opacity }); mk("use", { href: "#spark", x: x + 1 * k, y: y + 3 * k, width: 4.5 * k, height: 4.5 * k, fill: "#F2B33D", opacity }); }
     return u;
   }
-  const MURAL_GOALS = { "2026-11": 100 };  // per-month targets; raise as the community grows
+  const MURAL_GOALS = { "2026-11": 100, "2026-12": 100 };  // per-month targets; raise as the community grows
   const muralGoal = () => MURAL_GOALS[monthKey(now.getFullYear(), now.getMonth())] || 500;
   const colourFor = id => COLOURS[hash(String(id || "x")) % COLOURS.length][1];
   const myColour = () => priv.colour || colourFor(priv.seed);
+  // hidden pictures, drawn on a 300 x 300 board
+  const starPath = (() => { let d = ""; for (let i = 0; i < 10; i++) { const r = i % 2 ? 58 : 138, a = -Math.PI / 2 + i * Math.PI / 5; d += (i ? "L" : "M") + (150 + r * Math.cos(a)).toFixed(1) + " " + (160 + r * Math.sin(a)).toFixed(1) + " "; } return d + "Z"; })();
+  const PICTURES = {
+    heart: { name: "heart", path: "M150 262 C 92 222, 26 172, 34 108 C 40 62, 92 40, 126 66 C 138 75, 146 88, 150 98 C 154 88, 162 75, 174 66 C 208 40, 260 62, 266 108 C 274 172, 208 222, 150 262 Z" },
+    tree: { name: "Christmas tree", path: "M150 22 L222 112 L190 112 L248 186 L212 186 L268 258 L32 258 L88 186 L52 186 L110 112 L78 112 Z M124 256 L176 256 L176 292 L124 292 Z" },
+    star: { name: "star", path: starPath }
+  };
+  const MONTH_PICTURE = { "2026-11": "heart", "2026-12": "tree" };
+  const ROTATION = ["star", "heart", "tree"];
+  const monthPicture = (y = now.getFullYear(), m = now.getMonth()) => PICTURES[MONTH_PICTURE[monthKey(y, m)] || ROTATION[(y * 12 + m) % ROTATION.length]];
+  let insideCtx = null;
+  function insideTest(picture) {
+    try {
+      insideCtx = insideCtx || document.createElement("canvas").getContext("2d");
+      const p2 = new Path2D(picture.path);
+      return (x, y) => insideCtx.isPointInPath(p2, x, y);
+    } catch (e) { return () => true; }
+  }
   function muralCells(goal) {
-    const n = Math.ceil(Math.sqrt(goal)), step = 300 / n, cells = [];
+    const n = Math.ceil(Math.sqrt(goal)), step = 300 / n, cells = [], inside = insideTest(monthPicture());
     for (let row = 0; row < n; row++) for (let col = 0; col < n; col++) {
       const cx = col * step + step / 2, cy = row * step + step / 2;
-      const u = (cx - 150) / 112, v = (150 - cy) / 112 + 0.25, a = u * u + v * v - 1;
-      cells.push({ cx, cy, inside: a * a * a - u * u * v * v * v <= 0 });
+      cells.push({ cx, cy, inside: inside(cx, cy) });
     }
     const seed = "mural" + monthKey(now.getFullYear(), now.getMonth());
     cells.sort((p, q) => hash(seed + p.cx + "," + p.cy) - hash(seed + q.cx + "," + q.cy));
     return { cells: cells.slice(0, Math.max(goal, 1)), size: step };
   }
+  // draws the mural into any svg (the card, the reveal)
+  function paintMural(svg, rows, goal, done, o) {
+    const { cells, size } = muralCells(goal), NS = "http://www.w3.org/2000/svg", mine = o.mine;
+    svg.textContent = "";
+    cells.forEach((c, i) => {
+      const r = rows[i];
+      if (!r) { const d = document.createElementNS(NS, "circle"); d.setAttribute("cx", c.cx); d.setAttribute("cy", c.cy); d.setAttribute("r", Math.max(1.5, size * .06)); d.setAttribute("fill", "#E9DED3"); svg.appendChild(d); return; }
+      const hs = size * .92, rot = (hash(i + ":" + r.user_id) % 50) - 25;
+      const g = document.createElementNS(NS, "g");
+      const popping = o.animate && ((i === popIndex && mine(r)) || (recapPop && i >= recapPop[0] && i < recapPop[1]));
+      if (popping) { g.setAttribute("class", "pop"); if (recapPop && !(i === popIndex)) g.style.animationDelay = ((i - recapPop[0]) * 90) + "ms"; }
+      const gr = document.createElementNS(NS, "g"); gr.setAttribute("transform", "rotate(" + rot + " " + c.cx + " " + c.cy + ")"); g.appendChild(gr);
+      // the picture always shows: inside hands are bright, outside hands stay soft, even when finished
+      let op = c.inside ? 1 : (done ? .16 : .22);
+      if (o.findMine) op = mine(r) ? 1 : .08;
+      const col = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
+      const st = mine(r) && !shared ? myStyle() : (r.style || "classic");
+      const u = drawHand(gr, c.cx - hs / 2, c.cy - hs / 2, hs, col, st, op);
+      if (o.findMine && mine(r)) { u.setAttribute("stroke", "#2B2A33"); u.setAttribute("stroke-width", "1.2"); }
+      svg.appendChild(g);
+    });
+    if (done && !o.findMine) { const ol = document.createElementNS(NS, "path"); ol.setAttribute("d", monthPicture().path); ol.setAttribute("class", "outline"); svg.appendChild(ol); }
+  }
+
   function renderMural() {
     const goal = muralGoal();
     let rows = mural.rows, total = mural.total;
@@ -800,28 +860,14 @@
       total = rows.length;
     }
     const mine = r => r.user_id === me || r.user_id === "me-local";
-    const done = total >= goal, { cells, size } = muralCells(goal), svg = $("muralSvg");
-    const NS = "http://www.w3.org/2000/svg";
-    svg.textContent = "";
-    cells.forEach((c, i) => {
-      const r = rows[i];
-      if (!r) { const d = document.createElementNS(NS, "circle"); d.setAttribute("cx", c.cx); d.setAttribute("cy", c.cy); d.setAttribute("r", Math.max(1.5, size * .06)); d.setAttribute("fill", "#E9DED3"); svg.appendChild(d); return; }
-      const hs = size * .92, rot = (hash(i + ":" + r.user_id) % 50) - 25;
-      const g = document.createElementNS(NS, "g");
-      const popping = (i === popIndex && mine(r)) || (recapPop && i >= recapPop[0] && i < recapPop[1]);
-      if (popping) { g.setAttribute("class", "pop"); if (recapPop && !(i === popIndex)) g.style.animationDelay = ((i - recapPop[0]) * 90) + "ms"; }
-      const gr = document.createElementNS(NS, "g"); gr.setAttribute("transform", "rotate(" + rot + " " + c.cx + " " + c.cy + ")"); g.appendChild(gr);
-      let op = done || c.inside ? 1 : .3;
-      if (findMine) op = mine(r) ? 1 : .08;
-      const col = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
-      const st = mine(r) && !shared ? myStyle() : (r.style || "classic");
-      const u = drawHand(gr, c.cx - hs / 2, c.cy - hs / 2, hs, col, st, op);
-      if (findMine && mine(r)) { u.setAttribute("stroke", "#2B2A33"); u.setAttribute("stroke-width", "1.2"); }
-      svg.appendChild(g);
-    });
+    const done = total >= goal, svg = $("muralSvg");
+    paintMural(svg, rows, goal, done, { findMine, mine, animate: true });
     svg.setAttribute("aria-label", "Community mural: " + Math.min(total, goal) + " of " + goal + " handprints" + (rows.filter(mine).length ? ", " + rows.filter(mine).length + " of them yours" : ""));
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(), left = lastDay - now.getDate();
-    $("muralTitle").textContent = done ? "We did it! The " + MONTHS[now.getMonth()] + " mural is complete" : MONTHS[now.getMonth()] + " mural: a hidden picture is appearing…";
+    const pic = monthPicture(), nextM = MONTHS[(now.getMonth() + 1) % 12];
+    $("muralTitle").textContent = done ? "We did it! Together we made a " + pic.name : MONTHS[now.getMonth()] + " mural: a hidden picture is appearing…";
+    $("muralShare").classList.toggle("hidden", !done);
+    if (done && shared && !(priv.revealSeen || {})[monthKey(now.getFullYear(), now.getMonth())] && !$("revealSheet").classList.contains("show")) setTimeout(openReveal, 600);
     $("muralTag").textContent = shared ? "Community mural" : "Preview · mural";
     $("muralLeft").textContent = left === 0 ? "Last day" : left + (left === 1 ? " day left" : " days left");
     $("muralCount").textContent = Math.min(total, 1e9).toLocaleString("en-GB");
@@ -830,7 +876,7 @@
     $("muralFill").style.width = Math.min(100, total / goal * 100) + "%";
     const myN = rows.filter(mine).length;
     $("muralSub").textContent = !shared ? "Only your own handprints show for now. Everyone's appear once you're connected." :
-      done ? "Every handprint is a real act of kindness" + (myN ? ", and " + myN + " of them " + (myN === 1 ? "is" : "are") + " yours." : ".") :
+      done ? "Every handprint is a real act of kindness" + (myN ? ", and " + myN + " of them " + (myN === 1 ? "is" : "are") + " yours." : ".") + " " + nextM + "'s mural starts on 1 " + nextM + ". What will it show?" :
       "Every community act adds a handprint. Fill it together to reveal the hidden picture." + (myN ? " " + myN + " " + (myN === 1 ? "is" : "are") + " yours." : "");
     $("findMine").classList.toggle("on", findMine);
     $("findMine").textContent = findMine ? "Show everyone" : "Find my handprints";
@@ -1435,6 +1481,50 @@
     try { localStorage.removeItem(LS); localStorage.removeItem(AUTH_LS); } catch (e) {}
     location.reload();
   };
+
+  // ---------- mural reveal (once per month, when the target is reached) ----------
+  function openReveal() {
+    const goal = muralGoal(), k = monthKey(now.getFullYear(), now.getMonth()), pic = monthPicture(), nextM = MONTHS[(now.getMonth() + 1) % 12];
+    const mine = r => r.user_id === me;
+    paintMural($("revealSvg"), mural.rows, goal, true, { mine });
+    $("revealSub").textContent = "Together, " + Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness made this " + MONTHS[now.getMonth()] + " " + pic.name + ".";
+    const myN = mural.rows.filter(mine).length;
+    $("revealMine").textContent = myN ? myN + " of these handprints " + (myN === 1 ? "is" : "are") + " yours. Thank you." : "Every handprint is a real act of kindness.";
+    $("revealNext").textContent = nextM + "'s mural starts on 1 " + nextM + ". What will it show?";
+    $("revealSheet").classList.add("show");
+    try { navigator.vibrate && navigator.vibrate([40, 60, 40, 60, 80]); } catch (e) {}
+    priv.revealSeen = priv.revealSeen || {}; priv.revealSeen[k] = true; saveLocal();
+  }
+  $("revealClose").onclick = () => $("revealSheet").classList.remove("show");
+  // share card: the finished mural drawn onto an image
+  function muralCard() {
+    const cv = document.createElement("canvas"); cv.width = cv.height = 1080;
+    const g = cv.getContext("2d"), goal = muralGoal(), pic = monthPicture(), { cells, size } = muralCells(goal);
+    const grad = g.createLinearGradient(0, 0, 0, 1080); grad.addColorStop(0, "#D9F6EE"); grad.addColorStop(.6, "#FFF8F1"); grad.addColorStop(1, "#FFF8F1");
+    g.fillStyle = grad; g.fillRect(0, 0, 1080, 1080);
+    g.fillStyle = "#386C1C"; g.font = "700 56px 'Space Grotesk', sans-serif"; g.fillText("RAOK", 80, 120);
+    g.fillStyle = "#2B2A33"; g.font = "700 58px 'Space Grotesk', sans-serif"; g.fillText("Together we made a " + pic.name, 80, 200);
+    const S = 700 / 300, ox = 190, oy = 250;
+    g.save(); g.fillStyle = "#fff"; g.beginPath(); g.roundRect ? g.roundRect(ox - 20, oy - 20, 740, 740, 36) : g.rect(ox - 20, oy - 20, 740, 740); g.fill(); g.restore();
+    const R = [[6.2, 10.5, 11.6, 11.5, 4.6], [6.4, 3.6, 2.7, 10, 1.35], [9.6, 1.8, 2.7, 11, 1.35], [12.8, 2.6, 2.7, 10.4, 1.35], [15.9, 5.2, 2.5, 8.6, 1.25]];
+    cells.forEach((c, i) => {
+      const r = mural.rows[i]; if (!r) return;
+      const hs = size * .92 * S, rot = ((hash(i + ":" + r.user_id) % 50) - 25) * Math.PI / 180, k = hs / 24;
+      g.save(); g.translate(ox + c.cx * S, oy + c.cy * S); g.rotate(rot); g.translate(-hs / 2, -hs / 2);
+      g.globalAlpha = c.inside ? 1 : .16; g.fillStyle = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
+      R.forEach(([x, y, w, h, rr]) => { g.beginPath(); g.roundRect ? g.roundRect(x * k, y * k, w * k, h * k, rr * k) : g.rect(x * k, y * k, w * k, h * k); g.fill(); });
+      g.save(); g.translate(3 * k, 15.2 * k); g.rotate(-38 * Math.PI / 180); g.beginPath(); g.roundRect ? g.roundRect(-1.35 * k, -4 * k, 2.7 * k, 8 * k, 1.35 * k) : g.rect(-1.35 * k, -4 * k, 2.7 * k, 8 * k); g.fill(); g.restore();
+      g.restore();
+    });
+    try { g.save(); g.translate(ox, oy); g.scale(S, S); g.strokeStyle = "rgba(43,42,51,.55)"; g.lineWidth = 3; g.lineJoin = "round"; g.stroke(new Path2D(pic.path)); g.restore(); } catch (e) {}
+    g.fillStyle = "#4F4B57"; g.font = "500 36px Inter, sans-serif"; g.fillText(Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness · " + MONTHS[now.getMonth()] + " " + now.getFullYear(), 80, 1010);
+    g.fillStyle = "#386C1C"; g.font = "700 36px 'Space Grotesk', sans-serif"; const t = "raokapp.com"; g.fillText(t, 1000 - g.measureText(t).width, 1010);
+    $("cardImg").src = cv.toDataURL("image/png");
+    shareText = "Together, " + Math.max(mural.total, goal).toLocaleString("en-GB") + " acts of kindness made this " + MONTHS[now.getMonth()] + " " + pic.name + " on RAOK 💚 Join in: raokapp.com";
+    $("cardSheet").classList.add("show");
+  }
+  $("revealShare").onclick = () => { $("revealSheet").classList.remove("show"); muralCard(); };
+  $("muralShare").onclick = muralCard;
 
   // milestones
   const MILES = [7, 15, 50, 100, 250, 500, 1000];
