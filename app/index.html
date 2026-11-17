@@ -1427,6 +1427,7 @@
     try {
       const s = await ensureSession();
       await sb("acts_done?user_id=eq." + s.user_id, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+      try { await sb("app_opens?user_id=eq." + s.user_id, { method: "DELETE", headers: { Prefer: "return=minimal" } }); } catch (e) {}
     } catch (e) { serverOk = false; }
     if (!serverOk && !confirm("We couldn't reach the server to delete your shared data. Clear this phone anyway? You can email akindhello@raokapp.com and we'll delete the rest.")) return;
     try { localStorage.removeItem(LS); localStorage.removeItem(AUTH_LS); } catch (e) {}
