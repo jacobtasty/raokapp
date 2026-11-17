@@ -166,6 +166,18 @@
   .act .pl{display:block;font-family:Inter,sans-serif;font-size:15px;font-weight:500;line-height:1.45;color:var(--soft);margin-top:8px}
   .card.personal .act .hl{font-size:21px}
   .feel.picked{display:block}
+  .ringwrap .in .first{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;line-height:1.15;color:var(--teal-dark);max-width:130px;text-align:center}
+  .pulse{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:-4px}
+  .pulse span{font-size:13px;font-weight:600;color:var(--soft);background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  .story .rep{background:none;border:0;padding:4px 0;margin-top:4px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:2px;align-self:flex-end}
+  .reasons{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+  .reasons button{text-align:left;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:#fff;font-size:15px;font-weight:600;color:var(--ink)}
+  .reasons button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  .gate{position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#D9F6EE 0,#FFF8F1 60%);display:flex;align-items:center;justify-content:center;padding:24px}
+  .gate .box{max-width:360px;width:100%;background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:12px;text-align:center}
+  .gate h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px}
+  .ver a{color:inherit}
+  .gate a{color:var(--teal-dark)}
   .chips{display:flex;flex-wrap:wrap;gap:8px}
   .chips button{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--ink);font-size:14px;font-weight:600}
   .chips button.on{background:var(--teal-tint);border-color:var(--teal);color:var(--teal-dark)}
@@ -281,8 +293,9 @@
       <div class="label" style="align-self:flex-start"><span class="ldot live"></span><span id="liveLabel">Live today · community goal</span></div>
       <div class="ringwrap">
         <svg aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#E3EFEE" stroke-width="14"/><circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="#2BB8AE" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 540" transform="rotate(-90 100 100)"/></svg>
-        <div class="in"><b id="count" aria-live="polite">0</b><span class="s" id="peopleWord">people today</span><span class="goalpill" id="goalLine">Community goal: 10</span></div>
+        <div class="in"><b id="count" aria-live="polite">0</b><span class="first hidden" id="beFirst">Be the first today</span><span class="s" id="peopleWord">people today</span><span class="goalpill" id="goalLine">Community goal: 10</span></div>
       </div>
+      <div class="pulse hidden" id="pulse"><span id="pulseY"></span><span id="pulseAll"></span></div>
       <p class="hubline" id="hubline"></p>
       <button class="streakpill" id="streakPill">
         <span class="bolt"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span>
@@ -319,12 +332,14 @@
         <div class="act" id="communityAct"></div>
         <button class="big" id="didIt">I did it</button>
         <div id="afterDone" class="stack hidden">
-          <p class="proof">Research shows the person you helped probably felt even better than you think.</p>
+          <p class="proof">Research shows the person you helped probably felt even better than you think. <button class="tlink" id="whyBtn" type="button" style="color:inherit;padding:0;min-height:0;font-size:inherit">Why?</button></p>
           <div class="handline"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#hand" id="handlineUse"/></svg><span class="grow" id="handlineText">Your handprint is on the mural.</span><button class="tlink" id="seeMural" type="button">See it</button></div>
           <div><p class="flabel">How did it feel? Only you see this.</p><div class="feel" data-feel="c"></div></div>
           <div id="storyEdit" class="stack">
             <label><p class="flabel">Share what happened (optional, others will see it)</p>
             <textarea id="note" rows="2" maxlength="140" placeholder="e.g. Told the bus driver they made my morning"></textarea></label>
+            <p class="small" id="noteErr" role="alert" style="color:#B23A57;margin:0"></p>
+            <p class="small" style="color:var(--muted);margin:0">Please don't name people or share details that could identify them, especially children.</p>
             <div class="row">
               <button class="pill" id="skipNote">Not today</button>
               <button class="pill primary" id="saveNote">Share story</button>
@@ -424,7 +439,7 @@
 
         <p class="small" id="fbErr" style="color:#B23A57;margin:0" role="alert"></p>
         <button class="big" id="fbSend" type="submit">Send feedback</button>
-        <p class="small" style="color:var(--muted);margin:0">To help fix problems, we also send your phone type, screen size, town, comfort level and how many acts you have done. Nothing private, like your journal or feelings, is ever included.</p>
+        <p class="small" style="color:var(--muted);margin:0"><a href="/privacy.html" target="_blank" rel="noopener" style="color:inherit">Privacy policy</a>. To help fix problems, we also send your phone type, screen size, town, comfort level and how many acts you have done. Nothing private, like your journal or feelings, is ever included.</p>
       </form>
     </div>
     <div class="card hidden" id="fbThanks" style="text-align:center">
@@ -479,9 +494,10 @@
         <button class="pill" type="button" data-ts="2" aria-label="Larger text" style="font-size:18px">A</button>
       </div>
       <button class="link" id="resetApp">Start again from scratch</button>
+      <button class="link" id="deleteData" style="color:#B23A57">Delete my data</button>
       </div>
     </div>
-    <p class="ver">RAOK web app · early version · your progress is saved on this phone</p>
+    <p class="ver">RAOK web app · early version · <a href="/privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
   </section>
 </div>
 
@@ -520,6 +536,33 @@
   <pattern id="pDots" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.6" r=".75" fill="#fff" fill-opacity=".7"/></pattern>
   <symbol id="spark" viewBox="0 0 10 10"><path d="M5 0l1.2 3.8L10 5 6.2 6.2 5 10 3.8 6.2 0 5l3.8-1.2z"/></symbol>
 </defs></svg>
+
+<div class="overlay" id="reportSheet"><div class="sheet" role="dialog" aria-labelledby="repTitle">
+  <h3 id="repTitle">Report this story</h3>
+  <p class="sub">We'll hide it for you straight away. Stories reported by more than one person are hidden for everyone until the RAOK team checks them.</p>
+  <div class="reasons" id="repReasons"></div>
+  <p class="small" id="repErr" style="color:#B23A57;margin:0"></p>
+  <button class="big" id="repSend" type="button">Report and hide</button>
+  <button class="link" id="repCancel" type="button" style="display:block;margin:12px auto 0">Cancel</button>
+</div></div>
+
+<div class="overlay" id="whySheet"><div class="sheet" role="dialog" aria-labelledby="whyTitle">
+  <h3 id="whyTitle">Why we say that</h3>
+  <p class="sub">In 2022, psychologists Amit Kumar and Nicholas Epley ran a series of experiments, like asking people in a park to give a stranger a hot chocolate. Givers then guessed how the recipient felt, and recipients said how they actually felt.</p>
+  <p class="sub">Every time, the people being kind underestimated how good the other person felt. On a mood scale, givers guessed about 2.3, while recipients reported about 3.6.</p>
+  <p class="small" style="color:var(--muted)">Kumar, A. &amp; Epley, N. (2023). A little good goes an unexpectedly long way: Underestimating the positive impact of kindness on recipients. <i>Journal of Experimental Psychology: General</i>.</p>
+  <a class="pill" href="https://news.mccombs.utexas.edu/research/a-little-good-goes-farther-than-you-think/" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Read about the study</a>
+  <button class="link" id="whyClose" type="button" style="display:block;margin:12px auto 0">Close</button>
+</div></div>
+
+<div class="gate hidden" id="ageGate"><div class="box" role="dialog" aria-labelledby="ageTitle">
+  <div style="font-size:40px" aria-hidden="true">👋</div>
+  <h2 id="ageTitle">Welcome to RAOK</h2>
+  <p class="sub" id="ageText" style="margin:0">RAOK is for people aged 16 and over. Are you 16 or older?</p>
+  <button class="big" id="ageYes" type="button">Yes, I'm 16 or over</button>
+  <button class="pill" id="ageNo" type="button">No, I'm under 16</button>
+  <p class="small" style="margin:0"><a href="/privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
+</div></div>
 
 <div class="overlay" id="mileSheet"><div class="sheet mstone" role="dialog" aria-labelledby="mileTitle">
   <div class="num" id="mileNum">7</div>
@@ -576,11 +619,12 @@
 
   // ---------- State ----------
   const LS = "raok_v1";
-  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {}, colour: "", textSize: "auto", style: "classic", miles: [], muralSeen: null });
+  const blankPriv = () => ({ level: null, town: "", swaps: {}, personal: {}, journal: [], open: {}, feel: {}, why: "", seed: "", storyDone: {}, colour: "", textSize: "auto", style: "classic", miles: [], muralSeen: null, hiddenStories: {}, age16: false });
   const blankPub = () => ({ last: "", note: "", town: "", days: {}, at: 0 });
   let priv = blankPriv(), pub = blankPub();
   let todayDocs = [];
   let shared = false;
+  let stats = { yesterday: 0, all: 0 }, noHiddenCol = false;
   let todayTotal = 0, me = null, sbOk = false, pushPending = false, noStyleCol = false, recapPop = null, recapChecked = false;
   let mural = { rows: [], total: 0 }, findMine = false, pickedColour = null;
   let calY = now.getFullYear(), calM = now.getMonth();
@@ -650,10 +694,20 @@
   async function doRefresh() {
     try {
       if (pushPending) { pushPending = false; await pushToday(); return; }
-      const r = await sb("acts_done?day=eq." + TODAY + "&select=user_id,town,note,created_at&order=created_at.desc&limit=500", { headers: { Prefer: "count=exact" } });
+      const qT = cols => "acts_done?day=eq." + TODAY + "&select=" + cols + "&order=created_at.desc&limit=500";
+      let r;
+      try { r = await sb(qT(noHiddenCol ? "user_id,town,note,created_at" : "user_id,town,note,created_at,hidden"), { headers: { Prefer: "count=exact" } }); }
+      catch (e) { if (noHiddenCol || !/rest 400/.test(e.message)) throw e; noHiddenCol = true; r = await sb(qT("user_id,town,note,created_at"), { headers: { Prefer: "count=exact" } }); }
       const rows = await r.json();
+      try {
+        const yd = dateOf(dayNum - 1);
+        const [ry, ra] = await Promise.all([
+          sb("acts_done?day=eq." + yd + "&select=day&limit=1", { headers: { Prefer: "count=exact" } }),
+          sb("acts_done?select=day&limit=1", { headers: { Prefer: "count=exact" } })]);
+        stats = { yesterday: totalOf(ry, 0), all: totalOf(ra, 0) };
+      } catch (e) { console.warn("RAOK stats", e); }
       todayTotal = totalOf(r, rows.length);
-      todayDocs = rows.map(x => ({ uid: x.user_id, town: x.town, note: x.note, last: TODAY, at: Date.parse(x.created_at) }));
+      todayDocs = rows.map(x => ({ uid: x.user_id, town: x.town, note: x.hidden ? null : x.note, last: TODAY, at: Date.parse(x.created_at) }));
       const m = monthKey(now.getFullYear(), now.getMonth()), goal = muralGoal();
       const end = monthKey(now.getFullYear(), now.getMonth()) + "-" + String(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).padStart(2, "0");
       const q2 = cols => "acts_done?day=gte." + m + "-01&day=lte." + end + "&select=" + cols + "&order=created_at.asc&limit=" + goal;
@@ -907,13 +961,18 @@
     // ring
     const c = count(), goal = goalFor(c);
     $("count").textContent = c.toLocaleString("en-GB");
+    $("count").classList.toggle("hidden", c === 0); $("peopleWord").classList.toggle("hidden", c === 0); $("beFirst").classList.toggle("hidden", c !== 0);
+    $("pulse").classList.toggle("hidden", !shared || !(stats.yesterday || stats.all));
+    $("pulseY").textContent = "Yesterday: " + stats.yesterday.toLocaleString("en-GB") + (stats.yesterday === 1 ? " person" : " people");
+    $("pulseAll").textContent = stats.all.toLocaleString("en-GB") + " handprints so far";
+    $("pulseY").classList.toggle("hidden", !stats.yesterday); $("pulseAll").classList.toggle("hidden", !stats.all);
     $("goalLine").textContent = "Community goal: " + goal.toLocaleString("en-GB");
     $("peopleWord").textContent = (c === 1 ? "person" : "people") + " today";
     $("ringArc").setAttribute("stroke-dasharray", (540 * Math.min(1, c / goal)).toFixed(1) + " 540");
     $("ringArc").style.opacity = c ? 1 : 0;
     const towns = new Set(todayDocs.map(d => d.town).filter(Boolean));
     $("liveLabel").textContent = shared ? "Live · the whole community today" : "Preview · the whole community today";
-    $("hubline").textContent = !shared ? (c ? "That's you counted! The whole community's count goes live once accounts are switched on." : "Do today's act to get counted. The whole community's count goes live once accounts are switched on.") : c === 0 ? "Nobody has ticked off today's act yet. Be the first!" :
+    $("hubline").textContent = !shared ? (c ? "That's you counted! The whole community's count goes live once accounts are switched on." : "Do today's act to get counted. The whole community's count goes live once accounts are switched on.") : c === 0 ? (stats.yesterday ? "Today's count starts fresh. Do the act and get things going." : "Do today's act and start the count.") :
       (c === 1 ? "1 person has" : c.toLocaleString("en-GB") + " people have") + " been kind today" + (towns.size >= 2 ? ", across " + towns.size + " towns" : "") + ". Let's reach " + goal.toLocaleString("en-GB") + ".";
     const st = SI.streak;
     $("streakPillText").textContent = (st ? st + " day streak" : "Start your streak today") + (SI.bank ? " · " + SI.bank + " saved" : "");
@@ -977,13 +1036,15 @@
     $("storiesTag").textContent = shared ? "Live" : "Coming soon";
     $("storiesSub").textContent = shared ? "What people did today, in their own words." : "Stories from everyone will appear here once accounts are switched on.";
     const box = $("stories"); box.textContent = "";
-    const withNotes = todayDocs.filter(d => d.note && d.last === TODAY).sort((a, b) => (b.at || 0) - (a.at || 0));
+    const hiddenByMe = priv.hiddenStories || {};
+    const withNotes = todayDocs.filter(d => d.note && d.last === TODAY && !hiddenByMe[d.uid + ":" + TODAY]).sort((a, b) => (b.at || 0) - (a.at || 0));
     if (!withNotes.length) box.appendChild(el("div", "empty", "No stories yet today. Reveal your act, do it, and be the first to share!"));
     withNotes.forEach(d => {
       const s = el("div", "story"), top = el("div", "top"), w = el("div", "label");
       w.append(el("span", "ldot"), el("span", null, d.town ? String(d.town).slice(0, 40) : "Somewhere"));
       top.append(w, el("span", "when", ago(d.at)));
       s.append(top, el("div", "text", String(d.note).slice(0, 140)));
+      if (shared && d.uid && d.uid !== me) { const rb = el("button", "rep", "Report"); rb.type = "button"; rb.setAttribute("aria-label", "Report this story"); rb.onclick = () => openReport(d.uid); s.appendChild(rb); }
       box.appendChild(s);
     });
 
@@ -1064,8 +1125,20 @@
   $("qaJournal").onclick = () => { showView("you"); setTimeout(() => $("journalList").scrollIntoView({ behavior: "smooth", block: "start" }), 50); };
   $("streakPill").onclick = () => showView("you");
   const wrapStory = () => { priv.storyDone = priv.storyDone || {}; priv.storyDone[TODAY] = true; storyEditing = false; persist(); render(); };
+  // keep public stories kind and free of spam or personal details (a basic first line of defence)
+  const BAD = ["fuck","shit","cunt","bitch","bastard","wanker","twat","dick","prick","slut","whore","nigger","nigga","faggot","fag","retard","paki","spastic","tranny","kys","kill yourself"];
+  function storyProblem(t) {
+    const low = " " + t.toLowerCase().replace(/[^a-z0-9@.:/ ]/g, " ") + " ";
+    if (BAD.some(w => low.includes(" " + w + " ") || low.includes(" " + w + "s ") || low.includes(" " + w + "ing ") || low.includes(" " + w + "ed "))) return "Please keep stories kind. Try rewording that.";
+    if (/https?:|www\.|\.(com|co\.uk|net|org|io|ly)\b|@[a-z0-9]/i.test(t)) return "Stories can't include links, emails or social handles.";
+    if (/(\d[\s-]?){9,}/.test(t)) return "Please don't include phone numbers or other personal details.";
+    return "";
+  }
+  $("note").addEventListener("input", () => { $("noteErr").textContent = ""; });
   $("saveNote").onclick = () => {
     const n = $("note").value.trim().slice(0, 140);
+    const prob = n && storyProblem(n);
+    if (prob) { $("noteErr").textContent = prob; $("note").focus(); return; }
     if (!n && !storyEditing) { $("note").focus(); return; }
     pub.note = n; pub.at = Date.now(); wrapStory();
   };
@@ -1180,13 +1253,54 @@
     if (step < INTRO.length - 1) { step++; showIntro(); return; }
     $("intro").classList.remove("show"); openSetup(true);
   };
-  if (!priv.level) showIntro();
+  function startApp() {
+    if (!priv.level) showIntro();
+    refresh();
+  }
   $("resetApp").onclick = () => {
     if (!confirm("Start again from scratch? This clears your streak, journal and settings on this phone.")) return;
     try { localStorage.removeItem(LS); } catch (e) {}
     location.reload();
   };
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // research source
+  $("whyBtn").onclick = () => $("whySheet").classList.add("show");
+  $("whyClose").onclick = () => $("whySheet").classList.remove("show");
+  $("whySheet").onclick = e => { if (e.target === $("whySheet")) $("whySheet").classList.remove("show"); };
+
+  // reporting stories
+  const REASONS = ["Unkind or offensive", "Spam or advertising", "Shares someone's personal details", "Involves a child", "Something else"];
+  let repTarget = null, repReason = "";
+  function openReport(uid) {
+    repTarget = uid; repReason = ""; $("repErr").textContent = "";
+    const box = $("repReasons"); box.textContent = "";
+    REASONS.forEach(r => { const b = el("button", "", r); b.type = "button"; b.onclick = () => { repReason = r; box.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }; box.appendChild(b); });
+    $("reportSheet").classList.add("show");
+  }
+  $("repCancel").onclick = () => $("reportSheet").classList.remove("show");
+  $("repSend").onclick = async () => {
+    if (!repReason) { $("repErr").textContent = "Pick a reason first."; return; }
+    priv.hiddenStories = priv.hiddenStories || {}; priv.hiddenStories[repTarget + ":" + TODAY] = true; saveLocal();
+    $("reportSheet").classList.remove("show"); render();
+    try { await sb("reports", { method: "POST", headers: { Prefer: "return=minimal" }, body: { story_user: repTarget, story_day: TODAY, reason: repReason } }); }
+    catch (e) { console.warn("RAOK report", e); }
+    notice("Thanks. That story is hidden for you, and the RAOK team will review it.");
+    setTimeout(() => notice(""), 5000);
+  };
+
+  // delete my data (server rows + this phone)
+  $("deleteData").onclick = async () => {
+    if (!confirm("Delete your data? This removes your acts, stories and handprints from RAOK, and clears everything on this phone. It can't be undone.")) return;
+    let serverOk = true;
+    try {
+      const s = await ensureSession();
+      await sb("acts_done?user_id=eq." + s.user_id, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+    } catch (e) { serverOk = false; }
+    if (!serverOk && !confirm("We couldn't reach the server to delete your shared data. Clear this phone anyway? You can email akindhello@raokapp.com and we'll delete the rest.")) return;
+    try { localStorage.removeItem(LS); localStorage.removeItem(AUTH_LS); } catch (e) {}
+    location.reload();
+  };
 
   // milestones
   const MILES = [7, 15, 50, 100, 250, 500, 1000];
@@ -1344,10 +1458,20 @@
   };
   $("colourSheet").onclick = e => { if (e.target === $("colourSheet")) $("colourSheet").classList.remove("show"); };
 
-  // connect to the shared community, then keep it fresh while the app is open
-  refresh();
-  setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 60000);
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
+  // age check first: no sign-in, intro or data until someone confirms they're 16+
+  if (priv.age16) startApp();
+  else {
+    $("ageGate").classList.remove("hidden");
+    $("ageYes").onclick = () => { priv.age16 = true; saveLocal(); $("ageGate").classList.add("hidden"); startApp(); };
+    $("ageNo").onclick = () => {
+      $("ageTitle").textContent = "Sorry, not yet";
+      $("ageText").textContent = "RAOK is for people aged 16 and over for now. We haven't saved anything about you. Ask a parent or carer about doing kind things together, and come back when you're 16!";
+      $("ageYes").classList.add("hidden"); $("ageNo").classList.add("hidden");
+    };
+  }
+  // keep the shared community fresh while the app is open
+  setInterval(() => { if (priv.age16 && document.visibilityState === "visible") refresh(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (priv.age16 && document.visibilityState === "visible") refresh(); });
 })();
 </script>
 </body>
