@@ -1002,10 +1002,13 @@
     // whatever still needs doing goes first
     const acts = $("acts");
     const cWrapped = did && ((priv.storyDone || {})[TODAY] || (pub.last === TODAY && !!pub.note)) && !storyEditing;
-    if (cWrapped && !p) acts.insertBefore($("pCard"), $("cCard")); else acts.insertBefore($("cCard"), $("pCard"));
+    // only move cards when they're out of place: moving a card takes the cursor out of any box inside it
+    const placeBefore = (a, b) => { if (a.nextElementSibling !== b) b.parentNode.insertBefore(a, b); };
+    const placeAfter = (a, b) => { if (b.nextElementSibling !== a) b.after(a); };
+    if (cWrapped && !p) placeBefore($("pCard"), $("cCard")); else placeBefore($("cCard"), $("pCard"));
     // when everything's done, the mural is the next thing to look at
-    $("doneCard").after($("acts"));
-    if (all) $("acts").after($("muralCard")); else $("chCard").after($("muralCard"));
+    placeAfter($("acts"), $("doneCard"));
+    if (all) placeAfter($("muralCard"), $("acts")); else placeAfter($("muralCard"), $("chCard"));
     if (all) {
       $("dlC").textContent = communityAct.h;
       const pa = personalAct();
@@ -1053,6 +1056,14 @@
 
   // ---------- Render ----------
   function render() {
+    const fa = document.activeElement, keep = fa && (fa.id === "note" || fa.id === "fbMsg" || fa.tagName === "INPUT") ? { el: fa, s: fa.selectionStart, e: fa.selectionEnd } : null;
+    try { renderInner(); } finally {
+      if (keep && document.activeElement !== keep.el && document.body.contains(keep.el) && keep.el.offsetParent) {
+        keep.el.focus({ preventScroll: true }); try { keep.el.setSelectionRange(keep.s, keep.e); } catch (e) {}
+      }
+    }
+  }
+  function renderInner() {
     const SI = streakInfo();
     $("dateLabel").textContent = now.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
     const easy = !!(priv.easy || {})[TODAY] && EASIER[communityAct.id];
