@@ -360,7 +360,8 @@
           <div><p class="flabel">How did it feel? Only you see this.</p><div class="feel" data-feel="c"></div></div>
           <div id="storyEdit" class="stack">
             <label><p class="flabel">Share what happened (optional, others will see it)</p>
-            <textarea id="note" rows="2" maxlength="140" placeholder="e.g. Told the bus driver they made my morning"></textarea></label>
+            <textarea id="note" rows="4" maxlength="280" placeholder="e.g. Told the bus driver they made my morning"></textarea></label>
+            <p class="small" id="noteCount" style="color:var(--muted);margin:0;text-align:right">0 / 280</p>
             <p class="small" id="noteErr" role="alert" style="color:#B23A57;margin:0"></p>
             <p class="small" style="color:var(--muted);margin:0">Please don't name people or share details that could identify them, especially children.</p>
             <div class="row">
@@ -1156,7 +1157,7 @@
       const s = el("div", "story"), top = el("div", "top"), w = el("div", "label");
       w.append(el("span", "ldot"), el("span", null, d.town ? String(d.town).slice(0, 40) : "Somewhere"));
       top.append(w, el("span", "when", ago(d.at)));
-      s.append(top, el("div", "text", String(d.note).slice(0, 140)));
+      s.append(top, el("div", "text", String(d.note).slice(0, 280)));
       if (shared && d.uid && d.uid !== me) { const rb = el("button", "rep", "Report"); rb.type = "button"; rb.setAttribute("aria-label", "Report this story"); rb.onclick = () => openReport(d.uid); s.appendChild(rb); }
       box.appendChild(s);
     });
@@ -1247,16 +1248,17 @@
     if (/(\d[\s-]?){9,}/.test(t)) return "Please don't include phone numbers or other personal details.";
     return "";
   }
-  $("note").addEventListener("input", () => { $("noteErr").textContent = ""; });
+  const noteCount = () => { $("noteCount").textContent = $("note").value.length + " / 280"; };
+  $("note").addEventListener("input", () => { $("noteErr").textContent = ""; noteCount(); });
   $("saveNote").onclick = () => {
-    const n = $("note").value.trim().slice(0, 140);
+    const n = $("note").value.trim().slice(0, 280);
     const prob = n && storyProblem(n);
     if (prob) { $("noteErr").textContent = prob; $("note").focus(); return; }
     if (!n && !storyEditing) { $("note").focus(); return; }
     pub.note = n; pub.at = Date.now(); wrapStory();
   };
   $("skipNote").onclick = () => { if (!storyEditing) { pub.note = ""; } wrapStory(); };
-  $("editNote").onclick = () => { storyEditing = true; render(); setTimeout(() => $("note").focus(), 50); };
+  $("editNote").onclick = () => { storyEditing = true; render(); noteCount(); setTimeout(() => $("note").focus(), 50); };
   $("pDone").onclick = () => { priv.personal[TODAY] = "done"; persist("priv"); render(); checkMilestone(); };
   $("pSkip").onclick = () => { priv.personal[TODAY] = "skip"; persist("priv"); render(); };
   $("pSwap").onclick = () => { priv.swaps[TODAY] = (priv.swaps[TODAY] || 0) + 1; persist("priv"); render(); };
