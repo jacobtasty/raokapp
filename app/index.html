@@ -540,6 +540,7 @@
         <button class="pill" type="button" data-ts="1" aria-label="Large text" style="font-size:16px">A</button>
         <button class="pill" type="button" data-ts="2" aria-label="Larger text" style="font-size:18px">A</button>
       </div>
+      <p class="small" id="myCode" style="color:var(--soft);margin:0"></p>
       <p class="small" id="diag" style="color:var(--muted);margin:0"></p>
       <button class="link" id="resetApp">Start again from scratch</button>
       <button class="link" id="deleteData" style="color:#B23A57">Delete my data</button>
@@ -1406,6 +1407,8 @@
     renderDiag();
   }
   function renderDiag() {
+    const mc = $("myCode");
+    if (mc) { const id = (session && session.user_id) || me; mc.textContent = id ? "Your RAOK code: " + String(id).slice(0, 8) : ""; }
     const d = $("diag"); if (!d) return;
     d.textContent = "Connection: " + (shared ? "connected ✓" : "not connected") + " · Today's visit: " +
       (priv.openLogged === TODAY ? "recorded ✓" : openStatus ? "not recorded (" + openStatus + ")" : "checking…");
