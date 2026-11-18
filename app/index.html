@@ -827,10 +827,23 @@
   var MURAL_LOOK = "picture";
   // pictures only look good with lots of handprints, so they switch on once a month's target is 400+
   const PICTURE_MIN = 400;
-  const isPale = hex => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255 > .74; };
+  const isPale = hex => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255 > (MURAL_PASTEL === "off" ? .74 : .86); };
   const usePicture = () => muralGoal() >= PICTURE_MIN;
+  // "off": colours as chosen · "all": every hand pastel · "keepSkin": pastel colours, true skin tones
+  var MURAL_PASTEL = "keepSkin";
+  const SKIN_SET = () => SKINS.map(x => x[1].toLowerCase());
+  function pastel(hex, mix) {
+    const n = parseInt(hex.slice(1), 16), m = c => Math.round(c + (255 - c) * mix);
+    return "#" + [m(n >> 16), m(n >> 8 & 255), m(n & 255)].map(v => v.toString(16).padStart(2, "0")).join("");
+  }
+  function soften(hex) {
+    if (MURAL_PASTEL === "off") return hex;
+    const skin = SKIN_SET().includes(hex.toLowerCase());
+    if (skin) return MURAL_PASTEL === "all" ? pastel(hex, .35) : hex;
+    return pastel(hex, .45);
+  }
   function handLook(r, c, i, done) {
-    if (!usePicture()) return { col: /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id), op: 1 };
+    if (!usePicture()) return { col: soften(/^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id)), op: 1 };
     const pic = monthPicture(), pal = c.inside ? pic.in : pic.out;
     const own = /^#[0-9a-f]{6}$/i.test(r.colour || "") ? r.colour : colourFor(r.user_id);
     const col = MURAL_LOOK === "mine" && c.inside ? own : pal[hash(i + ":" + r.user_id) % pal.length];
